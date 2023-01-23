@@ -5,8 +5,8 @@ import math
 
 
 def run(missing):
-    names = ['sepal_l','sepal_w','petal_l','petal_w','classes']
-    data = pd.read_csv('data/iris.data', names = names)
+    names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
+    data = pd.read_csv('data/iris.data', names=names)
     y = data['classes']
     X = data.drop(['classes'], axis=1)
 
@@ -21,7 +21,8 @@ def run(missing):
     NCC.train(X, y)
     NCC_predictions = NCC.predict(X)
 
-    NBC_acc, NCC_acc, NCC_d_acc = helper_functions.discounted_accuracies(y, NBC_predictions, NCC_predictions)
+    NBC_acc, NCC_acc, NCC_d_acc = helper_functions.discounted_accuracies(
+        y, NBC_predictions, NCC_predictions)
 
     # print('Mistakes:')
     # print('Index \t Prediction \t \t True')
@@ -40,13 +41,16 @@ def run(missing):
         del NBC_predictions[i]
         del y_[i]
 
-    NBC_e_acc, NCC_e_acc = helper_functions.exact_accuracies(y_, NCC_predictions, NBC_predictions)
+    NBC_e_acc, NCC_e_acc = helper_functions.exact_accuracies(
+        y_, NCC_predictions, NBC_predictions)
 
     return NBC_acc, NCC_acc, NCC_d_acc, NBC_e_acc, NCC_e_acc
 
+
 runs = 10
 missing = 50
-NBC_acc_, NCC_acc_, NCC_d_acc_, NBC_e_acc_, NCC_e_acc_ = list(), list(), list(), list(), list()
+NBC_acc_, NCC_acc_, NCC_d_acc_, NBC_e_acc_, NCC_e_acc_ = list(
+), list(), list(), list(), list()
 for a in range(runs):
     NBC_acc, NCC_acc, NCC_d_acc, NBC_e_acc, NCC_e_acc = run(missing)
     NBC_acc_.append(NBC_acc)

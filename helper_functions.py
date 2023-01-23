@@ -3,6 +3,7 @@ import math
 import random
 import numpy as np
 
+
 def create_missing_data(data: pd.DataFrame, percentage):
     to_delete = math.ceil(data.shape[0] * data.shape[1] * (percentage / 100))
     cells = set()
@@ -18,15 +19,18 @@ def create_missing_data(data: pd.DataFrame, percentage):
 
     return data
 
+
 def discounted_accuracies(y, NBC_predictions, NCC_predictions):
-    NBC_acc = (sum(1 for a,b in zip(NBC_predictions, y) if a == b) / len(y)) * 100
+    NBC_acc = (sum(1 for a, b in zip(NBC_predictions, y)
+               if a == b) / len(y)) * 100
     print('NBC accuracy: ' + str("%.2f" % NBC_acc) + '%')
 
-    NCC_acc = (sum(1 for a,b in zip(NCC_predictions, y) if a == b) / len(y)) * 100
+    NCC_acc = (sum(1 for a, b in zip(NCC_predictions, y)
+               if a == b) / len(y)) * 100
     print('NCC accuracy: ' + str("%.2f" % NCC_acc) + '%')
 
     correct = 0
-    for a,b in zip(NCC_predictions, y):
+    for a, b in zip(NCC_predictions, y):
         if a == b:
             correct += 1
         elif b in a:
@@ -36,11 +40,14 @@ def discounted_accuracies(y, NBC_predictions, NCC_predictions):
 
     return NBC_acc, NCC_acc, NCC_d_acc
 
+
 def exact_accuracies(y, NBC_predictions, NCC_predictions):
-    NBC_e_acc = (sum(1 for a,b in zip(NBC_predictions, y) if a == b) / len(y)) * 100
+    NBC_e_acc = (sum(1 for a, b in zip(
+        NBC_predictions, y) if a == b) / len(y)) * 100
     print('NBC robust accuracy: ' + str("%.2f" % NBC_e_acc) + '%')
 
-    NCC_e_acc = (sum(1 for a,b in zip(NCC_predictions, y) if a == b) / len(y)) * 100
+    NCC_e_acc = (sum(1 for a, b in zip(
+        NCC_predictions, y) if a == b) / len(y)) * 100
     print('NCC robust accuracy: ' + str("%.2f" % NCC_e_acc) + '%')
 
     return NBC_e_acc, NCC_e_acc

@@ -4,16 +4,17 @@ import pandas as pd
 
 class NBC:
     def __init__(self):
-        self.priors = dict() # Dict with class: prob
-        self.likelihood = dict() # Dict with column: dict, with dict value: dict, with dict class: prob 
-        self.marginal = dict() # Dict with column: dict, with dict value: prob 
+        self.priors = dict()  # Dict with class: prob
+        # Dict with column: dict, with dict value: dict, with dict class: prob
+        self.likelihood = dict()
+        self.marginal = dict()  # Dict with column: dict, with dict value: prob
 
     def set_likelihood(self):
         for col_name in self.X_train.columns:
             column = self.X_train[col_name]
             self.likelihood[col_name] = dict()
             for value in np.unique(column):
-                total_a = column.value_counts()[value]               
+                total_a = column.value_counts()[value]
                 self.likelihood[col_name][value] = dict()
                 for c in self.classes:
                     total_a_given_c = column[self.y_train == c]
@@ -44,7 +45,7 @@ class NBC:
 
         self.set_likelihood()
         self.set_priors()
-        self.set_marginal()    
+        self.set_marginal()
 
     def get_likelihood(self, values: list, c):
         prob = 1
@@ -53,10 +54,10 @@ class NBC:
             value = values[i]
             prob = prob * self.likelihood[col_name][value][c]
         return prob
-    
+
     def get_prior(self, c):
         return self.priors[c]
-    
+
     def get_marginal(self, values: list):
         prob = 1
         for i in range(len(self.X_train.columns)):
@@ -68,7 +69,7 @@ class NBC:
     def bayes(self, l, p, m):
         post = l * p / m
         return post
-    
+
     def predict(self, X: pd.DataFrame):
         predictions = list()
         for _, x in X.iterrows():
@@ -84,19 +85,19 @@ class NBC:
         return predictions
 
 
-
 class NCC:
     def __init__(self):
-        self.priors = dict() # Dict with class: prob
-        self.likelihood = dict() # Dict with column: dict, with dict value: dict, with dict class: prob 
-        self.marginal = dict() # Dict with column: dict, with dict value: prob 
+        self.priors = dict()  # Dict with class: prob
+        # Dict with column: dict, with dict value: dict, with dict class: prob
+        self.likelihood = dict()
+        self.marginal = dict()  # Dict with column: dict, with dict value: prob
 
     def set_likelihood(self):
         for col_name in self.X_train.columns:
             column = self.X_train[col_name]
             self.likelihood[col_name] = dict()
             for value in np.unique(column):
-                total_a = column.value_counts()[value]               
+                total_a = column.value_counts()[value]
                 self.likelihood[col_name][value] = dict()
                 for c in self.classes:
                     total_a_given_c = column[self.y_train == c]
@@ -134,7 +135,7 @@ class NCC:
 
         self.set_likelihood()
         self.set_priors()
-        self.set_marginal()    
+        self.set_marginal()
 
     def get_likelihood(self, values: list, c):
         lower = 1
@@ -145,10 +146,10 @@ class NCC:
             lower = lower * self.likelihood[col_name][value][c][0]
             upper = upper * self.likelihood[col_name][value][c][1]
         return (lower, upper)
-    
+
     def get_prior(self, c):
         return self.priors[c]
-    
+
     def get_marginal(self, values: list):
         lower = 1
         upper = 1
@@ -163,7 +164,7 @@ class NCC:
         lower = l[0] * p[0] / m[0]
         upper = l[1] * p[1] / m[1]
         return (lower, upper)
-    
+
     def interval_dominance(self, intervals: list):
         best_indices = list(range(len(intervals)))
         for i in range(len(intervals)):
@@ -181,7 +182,7 @@ class NCC:
         else:
             prediction = ''
         return prediction
-    
+
     def predict(self, X: pd.DataFrame):
         predictions = list()
         for _, x in X.iterrows():
@@ -194,4 +195,4 @@ class NCC:
                 posteriors.append(prob)
             prediction = self.interval_dominance(posteriors)
             predictions.append(prediction)
-        return predictions 
+        return predictions
