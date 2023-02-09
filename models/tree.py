@@ -6,9 +6,29 @@ import math
 class C45:
     def continuous_criterion(self, data_: pd.DataFrame, attribute, overall_entropy):
         data = data_.copy()
-        sorted_data = data.sort_values(by=[attribute])
         best_gain = -math.inf
-        best_threshold = 'something'
+        values = sorted(data[attribute].unique())
+        information = 0
+        split_information = 0
+        for i in range(len(values) - 1):
+            threshold = (values[i] + values[i+1]) / 2
+
+            check1 = data[data[attribute] < threshold]
+            information += self.entropy(check1) * check1.shape[0]
+            split_information += self.split_information(data.shape[0], check1.shape[0])
+
+            check2 = data[data[attribute] > threshold]
+            information += self.entropy(check2) * check2.shape[0]
+            split_information += self.split_information(data.shape[0], check2.shape[0])
+
+            gain = (overall_entropy - information) / split_information
+            if gain > best_gain:
+                best_gain = gain
+                best_threshold = threshold
+            
+            information = 0
+            split_information = 0
+        
         return best_gain, best_threshold
 
     def discrete_criterion(self, data: pd.DataFrame, attribute, overall_entropy):
@@ -20,7 +40,10 @@ class C45:
             information += self.entropy(check) * check.shape[0]
             split_information += self.split_information(data.shape[0], check.shape[0])
         information = information / data.shape[0]
-        gain = (overall_entropy - information) / split_information
+        if split_information == 0:
+            gain = 0
+        else:
+            gain = (overall_entropy - information) / split_information
         return gain
 
     def split_information(self, N, n):
@@ -64,15 +87,15 @@ class C45:
         split_attribute, threshold = self.gain_criterion(data)
         if threshold == None:
             categories = data[split_attribute].unique()
-            node = CategoricalNode(categories)
+            node = CategoricalNode(split_attribute, categories)
             for cat in categories:
                 new_data = data[data[split_attribute] == cat]
                 node.children.append(self.generate_tree(new_data))
-            return node
         else:
-            ...
-
-        # TODO
+            node = ThresholdNode(split_attribute, threshold)
+            node.children.append(self.generate_tree(data[data[split_attribute] < threshold]))
+            node.children.append(self.generate_tree(data[data[split_attribute] > threshold]))
+        return node
 
     def train(self, X: pd.DataFrame, y: pd.DataFrame):
         self.data = X.join(y)
@@ -86,14 +109,17 @@ class C45:
 
 
 class CategoricalNode:
-    def __init__(self, categories):
+    def __init__(self, attribute, categories):
+        self.attribute = attribute
         self.categories = categories
         self.children = []
 
 
 class ThresholdNode:
-    def __init__(self):
-        ...
+    def __init__(self, attribute, threshold):
+        self.attribute = attribute
+        self.threshold = threshold
+        self.children = []
 
 
 class Leaf:
