@@ -1,12 +1,14 @@
 import pandas as pd
-import naive
+import models.naive as naive
+import models.tree as tree
 import helper_functions
 import math
 
 
 def run_naive_classifiers(X, y, missing):
-    X = helper_functions.create_missing_data(X, missing)
-    X = X.fillna(X.mean())
+    if missing > 0:
+        X = helper_functions.create_missing_data(X, missing)
+        X = X.fillna(X.mean())
 
     NBC = naive.NBC()
     NBC.train(X, y)
@@ -41,25 +43,53 @@ def naive_classifiers(X, y, missing: int = 0, runs: int = 10):
     print("NCC_r_acc: " + str("%.2f" % (math.fsum(NCC_r_acc_list) / runs)) + '%')
 
 
+def run_tree_classifiers(X, y, missing):
+    if missing > 0:
+        X = helper_functions.create_missing_data(X, missing)
+        X = X.fillna(X.mean())
+
+    classical_tree = tree.C45()
+    classical_tree.train(X, y)
+    print('IT WORK!!!')
+    exit()
+    classical_predictions = classical_tree.predict()
+
+    return classical_predictions
+
+
+def tree_classifiers(X, y, missing: int = 0, runs: int = 10):
+    pred = run_tree_classifiers(X, y, missing)
+    return pred
+
+
 def run():
-    iris_names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
-    iris_data = pd.read_csv('UCI_data/iris.data', names=iris_names)
-    iris_y = iris_data['classes']
-    iris_X = iris_data.drop(['classes'], axis=1)
+    # iris_names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
+    # iris_data = pd.read_csv('UCI_data/iris.data', names=iris_names)
+    # iris_y = iris_data['classes']
+    # iris_X = iris_data.drop(['classes'], axis=1)
+    # balance_names = ['classes', 'left-weight', 'left-distance', 'right-weight', 'right-distance']
+    # balance_data = pd.read_csv('UCI_data/balance-scale.data', names=balance_names)
+    # balance_y = balance_data['classes']
+    # balance_X = balance_data.drop(['classes'], axis=1)
 
-    balance_names = ['classes', 'left-weight', 'left-distance', 'right-weight', 'right-distance']
-    balance_data = pd.read_csv('UCI_data/balance-scale.data', names=balance_names)
-    balance_y = balance_data['classes']
-    balance_X = balance_data.drop(['classes'], axis=1)
-
-    missing_data = 30
+    missing_data = 0
     cross_validations = 10
 
-    print('Iris')
-    naive_classifiers(iris_X, iris_y, missing_data, cross_validations)
-    print()
-    print('Balance')
-    naive_classifiers(balance_X, balance_y, missing_data, cross_validations)
+    # print('Iris')
+    # naive_classifiers(iris_X, iris_y, missing_data, cross_validations)
+    # print()
+    # print('Balance')
+    # naive_classifiers(balance_X, balance_y, missing_data, cross_validations)
+
+    weather_names = ['Outlook', 'Temperature', 'Humidity', 'Wind', 'classes']
+    weather_data = pd.read_csv('weka_weather.data', names=weather_names)
+    weather_y = weather_data['classes']
+    weather_X = weather_data.drop(['classes'], axis=1)
+
+    pred = tree_classifiers(weather_X, weather_y, missing_data, cross_validations)
+    print(weather_y.to_list())
+    print(pred)
+
 
 # helper_functions.create_names_dict()
 # names_dict = helper_functions.open_names_dict()
