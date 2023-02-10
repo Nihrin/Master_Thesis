@@ -84,7 +84,7 @@ def run():
     # naive_classifiers(balance_X, balance_y, missing_data, cross_validations)
 
     weather_names = ['Outlook', 'Temperature', 'Humidity', 'Wind', 'classes']
-    weather_data = pd.read_csv('weka_weather.data', names=weather_names)
+    weather_data = pd.read_csv('test_data/weka_weather.data', names=weather_names)
     weather_y = weather_data['classes']
     weather_X = weather_data.drop(['classes'], axis=1)
     pred = tree_classifiers(weather_X, weather_y,
