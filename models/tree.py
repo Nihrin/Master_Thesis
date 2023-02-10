@@ -15,20 +15,22 @@ class C45:
 
             check1 = data[data[attribute] < threshold]
             information += self.entropy(check1) * check1.shape[0]
-            split_information += self.split_information(data.shape[0], check1.shape[0])
+            split_information += self.split_information(
+                data.shape[0], check1.shape[0])
 
             check2 = data[data[attribute] > threshold]
             information += self.entropy(check2) * check2.shape[0]
-            split_information += self.split_information(data.shape[0], check2.shape[0])
+            split_information += self.split_information(
+                data.shape[0], check2.shape[0])
 
             gain = (overall_entropy - information) / split_information
             if gain > best_gain:
                 best_gain = gain
                 best_threshold = threshold
-            
+
             information = 0
             split_information = 0
-        
+
         return best_gain, best_threshold
 
     def discrete_criterion(self, data: pd.DataFrame, attribute, overall_entropy):
@@ -38,7 +40,8 @@ class C45:
         for value in values:
             check = data[data[attribute] == value]
             information += self.entropy(check) * check.shape[0]
-            split_information += self.split_information(data.shape[0], check.shape[0])
+            split_information += self.split_information(
+                data.shape[0], check.shape[0])
         information = information / data.shape[0]
         if split_information == 0:
             gain = 0
@@ -67,10 +70,12 @@ class C45:
             # for now assumed that this will not happen
             # or at least best is always singular best
             if check_discrete(data[attribute]):
-                gain = self.discrete_criterion(data, attribute, overall_entropy)
+                gain = self.discrete_criterion(
+                    data, attribute, overall_entropy)
                 new_threshold = None
-            else: 
-                gain, new_threshold = self.continuous_criterion(data, attribute, overall_entropy)
+            else:
+                gain, new_threshold = self.continuous_criterion(
+                    data, attribute, overall_entropy)
 
             if gain > best_gain:
                 best_gain = gain
@@ -90,11 +95,13 @@ class C45:
             node = CategoricalNode(split_attribute, categories)
             for cat in categories:
                 new_data = data[data[split_attribute] == cat]
-                node.children.append(self.generate_tree(new_data))
+                node.children[cat] = self.generate_tree(new_data)
         else:
             node = ThresholdNode(split_attribute, threshold)
-            node.children.append(self.generate_tree(data[data[split_attribute] < threshold]))
-            node.children.append(self.generate_tree(data[data[split_attribute] > threshold]))
+            node.children.append(self.generate_tree(
+                data[data[split_attribute] < threshold]))
+            node.children.append(self.generate_tree(
+                data[data[split_attribute] > threshold]))
         return node
 
     def train(self, X: pd.DataFrame, y: pd.DataFrame):
@@ -103,8 +110,33 @@ class C45:
         self.attributes = X.columns
         self.tree = self.generate_tree(self.data)
 
+    def find_child(self, node, row):
+        if type(node) == ThresholdNode:
+            if row[node.attribute] < node.threshold:
+                child_node = node.children[0]
+            elif row[node.attribute] > node.threshold:
+                child_node = node.children[1]
+        elif type(node) == CategoricalNode:
+            child_node = node.children[row[node.attribute]]
+        else:
+            print('ERROR: Can\'t find a child due to child type')
+        return child_node
+
+    def iterate_tree(self, row):
+        node = self.tree
+        while True:
+            if node.children:
+                node = self.find_child(node, row)
+            else:
+                prediction = node.prediction
+                break
+        return prediction
+
     def predict(self, X: pd.DataFrame):
-        predictions = []
+        predictions = list()
+        for _, x in X.iterrows():
+            prediction = self.iterate_tree(x)
+            predictions.append(prediction)
         return predictions
 
 
@@ -112,19 +144,20 @@ class CategoricalNode:
     def __init__(self, attribute, categories):
         self.attribute = attribute
         self.categories = categories
-        self.children = []
+        self.children = dict()
 
 
 class ThresholdNode:
     def __init__(self, attribute, threshold):
         self.attribute = attribute
         self.threshold = threshold
-        self.children = []
+        self.children = list()
 
 
 class Leaf:
     def __init__(self, prediction):
         self.prediction = prediction
+        self.children = list()
 
 
 def is_single_class(y: pd.DataFrame):

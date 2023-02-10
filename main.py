@@ -50,9 +50,7 @@ def run_tree_classifiers(X, y, missing):
 
     classical_tree = tree.C45()
     classical_tree.train(X, y)
-    print('IT WORK!!!')
-    exit()
-    classical_predictions = classical_tree.predict()
+    classical_predictions = classical_tree.predict(X)
 
     return classical_predictions
 
@@ -66,35 +64,38 @@ def run():
     MISSING_DATA = 0
     CROSS_VALIDATION = 10
 
-    iris_names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
-    iris_data = pd.read_csv('UCI_data/iris.data', names=iris_names)
-    iris_y = iris_data['classes']
-    iris_X = iris_data.drop(['classes'], axis=1)
-    pred = tree_classifiers(iris_X, iris_y, MISSING_DATA, CROSS_VALIDATION)
-    print(iris_y.to_list())
-    print(pred)
+    # iris_names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
+    # iris_data = pd.read_csv('UCI_data/iris.data', names=iris_names)
+    # iris_y = iris_data['classes']
+    # iris_X = iris_data.drop(['classes'], axis=1)
+    # pred = tree_classifiers(iris_X, iris_y, MISSING_DATA, CROSS_VALIDATION)
+    # print(iris_y.to_list())
+    # print(pred)
 
     # balance_names = ['classes', 'left-weight', 'left-distance', 'right-weight', 'right-distance']
     # balance_data = pd.read_csv('UCI_data/balance-scale.data', names=balance_names)
     # balance_y = balance_data['classes']
     # balance_X = balance_data.drop(['classes'], axis=1)
 
-
     # print('Iris')
     # naive_classifiers(iris_X, iris_y, missing_data, cross_validations)
     # print()
     # print('Balance')
     # naive_classifiers(balance_X, balance_y, missing_data, cross_validations)
-    
 
-
-    # weather_names = ['Outlook', 'Temperature', 'Humidity', 'Wind', 'classes']
-    # weather_data = pd.read_csv('weka_weather.data', names=weather_names)
-    # weather_y = weather_data['classes']
-    # weather_X = weather_data.drop(['classes'], axis=1)
-    # pred = tree_classifiers(weather_X, weather_y, MISSING_DATA, CROSS_VALIDATION)
-    # print(weather_y.to_list())
-    # print(pred)
+    weather_names = ['Outlook', 'Temperature', 'Humidity', 'Wind', 'classes']
+    weather_data = pd.read_csv('weka_weather.data', names=weather_names)
+    weather_y = weather_data['classes']
+    weather_X = weather_data.drop(['classes'], axis=1)
+    pred = tree_classifiers(weather_X, weather_y,
+                            MISSING_DATA, CROSS_VALIDATION)
+    print(weather_y.to_list())
+    print(pred)
+    count = 0
+    for a, b in zip(pred, weather_y.to_list()):
+        if a == b:
+            count += 1
+    print(count)
 
 
 # helper_functions.create_names_dict()
