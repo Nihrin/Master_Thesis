@@ -116,20 +116,23 @@ class C45:
                 child_node = node.children[0]
             elif row[node.attribute] > node.threshold:
                 child_node = node.children[1]
+            else:
+                return Leaf(None)
         elif type(node) == CategoricalNode:
             child_node = node.children[row[node.attribute]]
         else:
             print('ERROR: Can\'t find a child due to child type')
+            exit()
         return child_node
 
     def iterate_tree(self, row):
         node = self.tree
         while True:
-            if node.children:
-                node = self.find_child(node, row)
-            else:
+            if type(node) == Leaf:
                 prediction = node.prediction
                 break
+            else:
+                node = self.find_child(node, row)
         return prediction
 
     def predict(self, X: pd.DataFrame):
