@@ -10,6 +10,7 @@ class C45:
         values = sorted(data[attribute].unique())
         information = 0
         split_information = 0
+        best_threshold = None
         for i in range(len(values) - 1):
             threshold = (values[i] + values[i+1]) / 2
 
