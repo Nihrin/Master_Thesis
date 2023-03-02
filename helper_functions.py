@@ -38,7 +38,7 @@ def accuracies(y, classical_predictions, credal_predictions):
             r_correct += 1
             r_count += 1
         elif b in a:
-            d_correct += 1 / len(a)
+            d_correct += 1
         elif type(a) != list():
             r_count += 1
     discounted_credal_accuracy = (d_correct / len(y)) * 100

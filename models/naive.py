@@ -59,11 +59,11 @@ class NBC:
         return self.priors[c]
 
     def get_marginal(self, values: list):
-        prob = 1
+        prob = 0
         for i in range(len(self.X_train.columns)):
             col_name = self.X_train.columns[i]
             value = values[i]
-            prob = prob * self.marginal[col_name][value]
+            prob += self.marginal[col_name][value]
         return prob
 
     def bayes(self, l, p, m):
@@ -151,18 +151,18 @@ class NCC:
         return self.priors[c]
 
     def get_marginal(self, values: list):
-        lower = 1
-        upper = 1
+        lower = 0
+        upper = 0
         for i in range(len(self.X_train.columns)):
             col_name = self.X_train.columns[i]
             value = values[i]
-            lower = lower * self.marginal[col_name][value][0]
-            upper = upper * self.marginal[col_name][value][1]
+            lower += self.marginal[col_name][value][0]
+            upper += self.marginal[col_name][value][1]
         return (lower, upper)
 
     def bayes(self, l, p, m):
-        lower = l[0] * p[0] / m[0]
-        upper = l[1] * p[1] / m[1]
+        lower = l[0] * p[0] / m[1]
+        upper = l[1] * p[1] / m[0]
         return (lower, upper)
 
     def interval_dominance(self, intervals: list):
