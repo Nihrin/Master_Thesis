@@ -15,8 +15,9 @@ def run_naive_classifiers(X, y, missing):
     NBC.train(X, y)
     NBC_predictions = NBC.predict(X)
 
+    s = 1
     NCC = naive.NCC()
-    NCC.train(X, y)
+    NCC.train(X, y, s)
     NCC_predictions = NCC.predict(X)
 
     NBC_acc, NCC_acc, NCC_d_acc, NCC_r_acc = helper_functions.accuracies(
@@ -66,7 +67,7 @@ def tree_classifiers(X, y, missing: int = 0, runs: int = 10):
 
 
 def run():
-    MISSING_DATA = 0
+    MISSING_DATA = 30
     CROSS_VALIDATION = 1
 
     iris_names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
