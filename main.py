@@ -15,7 +15,7 @@ def run_naive_classifiers(X, y, missing):
     NBC.train(X, y)
     NBC_predictions = NBC.predict(X)
 
-    s = 1
+    s = 2
     NCC = naive.NCC()
     NCC.train(X, y, s)
     NCC_predictions = NCC.predict(X)
@@ -68,21 +68,22 @@ def tree_classifiers(X, y, missing: int = 0, runs: int = 10):
 
 def run():
     MISSING_DATA = 30
-    CROSS_VALIDATION = 1
+    CROSS_VALIDATION = 10
 
-    iris_names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
-    iris_data = pd.read_csv('UCI_data/iris.data', names=iris_names)
-    iris_y = iris_data['classes']
-    iris_X = iris_data.drop(['classes'], axis=1)
-    naive_classifiers(iris_X, iris_y, MISSING_DATA, CROSS_VALIDATION)
+    # iris_names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
+    # iris_data = pd.read_csv('UCI_data/iris.data', names=iris_names)
+    # iris_y = iris_data['classes']
+    # iris_X = iris_data.drop(['classes'], axis=1)
+    # naive_classifiers(iris_X, iris_y, MISSING_DATA, CROSS_VALIDATION)
     # pred, y_true = 
     # print(y_true.to_list())
     # print(pred)
 
-    # balance_names = ['classes', 'left-weight', 'left-distance', 'right-weight', 'right-distance']
-    # balance_data = pd.read_csv('UCI_data/balance-scale.data', names=balance_names)
-    # balance_y = balance_data['classes']
-    # balance_X = balance_data.drop(['classes'], axis=1)
+    balance_names = ['classes', 'left-weight', 'left-distance', 'right-weight', 'right-distance']
+    balance_data = pd.read_csv('UCI_data/balance-scale.data', names=balance_names)
+    balance_y = balance_data['classes']
+    balance_X = balance_data.drop(['classes'], axis=1)
+    naive_classifiers(balance_X, balance_y, MISSING_DATA, CROSS_VALIDATION)
 
     # print('Iris')
     # naive_classifiers(iris_X, iris_y, missing_data, cross_validations)
