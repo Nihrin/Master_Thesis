@@ -145,8 +145,6 @@ class SPNClassifier(BaseEstimator, ClassifierMixin):
             # otherwise, use a categorical distribution
             distributions = self.distributions + [Categorical]
         self.spn_ = learn_classifier(data, distributions, self.domains, **self.kwargs)
-        print("fit complete?")
-        exit()
         self.n_features_ = X.shape[1]
         self.n_classes_ = n_classes
         return self

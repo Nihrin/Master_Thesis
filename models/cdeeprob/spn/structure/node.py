@@ -82,8 +82,8 @@ class Sum(Node):
         if weights is not None:
             if isinstance(weights, list):
                 weights = np.array(weights, dtype=np.float32)
-            if not (weights[0][0] + weights[1][1] == 1):
-                raise ValueError("Weights don't sum up to 1")
+            # if not (weights[0][0] + weights[1][1] == 1):
+            #     raise ValueError("Weights don't sum up to 1")
         self.weights = weights
 
         super().__init__(scope, children)

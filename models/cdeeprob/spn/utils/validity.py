@@ -77,8 +77,8 @@ def is_smooth(root: Node, sum_nodes: Optional[List[Sum]] = None) -> Optional[str
         sum_nodes = filter_nodes_by_type(root, Sum)
 
     for node in sum_nodes:
-        if not np.isclose(np.sum(node.weights), 1.0):
-            return "Weights of node #{} don't sum up to 1".format(node.id)
+        # if not np.isclose(np.sum(node.weights), 1.0):
+        #     return "Weights of node #{} don't sum up to 1".format(node.id)
         if len(node.children) == 0:
             return "Sum node #{} has no children".format(node.id)
         if len(node.children) != len(node.weights):

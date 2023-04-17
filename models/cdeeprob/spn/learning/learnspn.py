@@ -145,8 +145,7 @@ def learn_spn(
         # Defaults to columns splitting
         else:
             op = OperationKind.SPLIT_COLS
-        
-        print(op)
+            
 
         if op == OperationKind.REM_FEATURES:
             node = Product(task.scope)
@@ -168,7 +167,8 @@ def learn_spn(
         elif op == OperationKind.CREATE_LEAF:
             # Create a leaf node
             dists, doms = [distributions[s] for s in task.scope], [domains[s] for s in task.scope]
-            leaf = learn_leaf_func(task.data, dists, doms, task.scope, **learn_leaf_kwargs)
+            data = task.data[~np.isnan(task.data)]
+            leaf = learn_leaf_func(data, dists, doms, task.scope, **learn_leaf_kwargs)
             task.parent.children.append(leaf)
         elif op == OperationKind.SPLIT_NAIVE:
             # Split the data using a naive factorization
@@ -222,10 +222,6 @@ def learn_spn(
         if verbose:
             tk.update()
             tk.refresh()
-        print('iteration finished')
-    
-    print('finish')
-    exit()
 
     if verbose:
         tk.close()

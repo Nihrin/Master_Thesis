@@ -196,28 +196,32 @@ def gtest(
     if distributions[i].LEAF_TYPE == LeafType.DISCRETE and distributions[j].LEAF_TYPE == LeafType.DISCRETE:
         b1 = domains[i] + [len(domains[i])]
         b2 = domains[j] + [len(domains[j])]
+        histx1, x1edges = np.histogram(x1_, bins=[b1, b2])
+        histx2, x2edges = np.histogram(x2_, bins=[b1, b2])
         lowhist, _, _ = np.histogram2d(lowx1, lowx2, bins=[b1, b2])
     elif distributions[i].LEAF_TYPE == LeafType.CONTINUOUS and distributions[j].LEAF_TYPE == LeafType.CONTINUOUS:
-        bins = int(np.ceil(np.sqrt(n_samples)))
-        _, x1edges = np.histogram(x1_, bins=bins)
-        _, x2edges = np.histogram(x2_, bins=bins)
+        histx1, x1edges = np.histogram(x1_, bins='scott')
+        histx2, x2edges = np.histogram(x2_, bins='scott')
         lowhist, _, _ = np.histogram2d(lowx1, lowx2, bins=[x1edges, x2edges])
     else:
         raise ValueError("Leaves distributions must be either discrete or continuous")
-    print(hist)
-    exit()
+    
+    uphist = lowhist.copy()
+    mr = np.sum(lowhist, axis=1, keepdims=True)
+    mc = np.sum(lowhist, axis=0, keepdims=True)
+    for r in range(len(lowhist)):
+        for c in range(len(lowhist[r])):
+            diffr = histx1[r] - mr[r][0]
+            diffc = histx2[c] - mc[0][c]
+            uphist[r,c] = lowhist[r,c] + diffr + diffc
 
+    hist = np.mean(np.array([lowhist, uphist]), axis=0)
     # Compute G-test statistics
     hist = hist.astype(np.float32) + np.finfo(np.float32).eps
     m1 = np.sum(hist, axis=1, keepdims=True)
     m2 = np.sum(hist, axis=0, keepdims=True)
-    print(hist)
-    print(m1, m2)
     e = m1 * m2 / n_samples
-    print(e)
     g_val = 2.0 * np.sum(hist * np.log(hist / e))
-    print(g_val)
-    exit()
 
     # Return test result
     if test:
