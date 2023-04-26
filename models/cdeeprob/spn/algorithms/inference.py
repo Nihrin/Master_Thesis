@@ -51,6 +51,45 @@ def log_likelihood(
         return_results=return_results
     )
 
+def min_log_likelihood(
+    root: Node,
+    x: np.ndarray,
+    return_results: bool = False
+) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
+    """
+    Compute the logarithmic likelihoods of the SPN given some inputs.
+
+    :param root: The root of the SPN.
+    :param x: The inputs. They can be marginalized using NaNs.
+    :param return_results: A flag indicating if this function must return the log likelihoods of each node of the SPN.
+    :return: The log likelihood values. Additionally it returns the log likelihood values of each node.
+    """
+    return eval_bottom_up(
+        root, x,
+        leaf_func=node_log_likelihood,
+        node_func=node_min_log_likelihood,
+        return_results=return_results
+    )
+
+def max_log_likelihood(
+    root: Node,
+    x: np.ndarray,
+    return_results: bool = False
+) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
+    """
+    Compute the logarithmic likelihoods of the SPN given some inputs.
+
+    :param root: The root of the SPN.
+    :param x: The inputs. They can be marginalized using NaNs.
+    :param return_results: A flag indicating if this function must return the log likelihoods of each node of the SPN.
+    :return: The log likelihood values. Additionally it returns the log likelihood values of each node.
+    """
+    return eval_bottom_up(
+        root, x,
+        leaf_func=node_log_likelihood,
+        node_func=node_max_log_likelihood,
+        return_results=return_results
+    )
 
 def mpe(root: Node, x: np.ndarray, inplace: bool = False) -> np.ndarray:
     """
@@ -92,6 +131,28 @@ def node_log_likelihood(node: Node, x: np.ndarray) -> np.ndarray:
     :return: The log-likelihoods of the node given the inputs.
     """
     lls = node.log_likelihood(x)
+    return np.squeeze(np.maximum(lls, -1e31), axis=1)
+
+def node_min_log_likelihood(node: Node, x: np.ndarray) -> np.ndarray:
+    """
+    Compute the log-likelihood of a node given the list of log-likelihoods of its children.
+
+    :param node: The internal node.
+    :param x: The array of log-likelihoods of the children.
+    :return: The log-likelihoods of the node given the inputs.
+    """
+    lls = node.min_log_likelihood(x)
+    return np.squeeze(np.minimum(lls, 1e31), axis=1)
+
+def node_max_log_likelihood(node: Node, x: np.ndarray) -> np.ndarray:
+    """
+    Compute the log-likelihood of a node given the list of log-likelihoods of its children.
+
+    :param node: The internal node.
+    :param x: The array of log-likelihoods of the children.
+    :return: The log-likelihoods of the node given the inputs.
+    """
+    lls = node.max_log_likelihood(x)
     return np.squeeze(np.maximum(lls, -1e31), axis=1)
 
 

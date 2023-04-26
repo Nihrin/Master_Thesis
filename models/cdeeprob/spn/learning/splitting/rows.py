@@ -39,7 +39,7 @@ def split_rows_clusters(
     for c in unique_clusters:
         local_data = data[clusters == c, :]
         slices.append(local_data)
-        weights.append([len(local_data) / n_samples] * 2)
+        weights.append(len(local_data) / n_samples)
     return slices, weights
 
 
@@ -57,7 +57,8 @@ def split_rows_clusters_credal(
              weights is a list of proportions of the local data in respect to the original data.
     """
     slices = list()
-    weights = list()
+    maxweights = list()
+    minweights = list()
     n_samples = len(data) + len(nans)
     unique_clusters = np.unique(clusters)
     for c in unique_clusters:
@@ -66,8 +67,9 @@ def split_rows_clusters_credal(
         local_data = np.vstack([local_data, nans])
         upper = len(local_data) / n_samples
         slices.append(local_data)
-        weights.append([lower, upper])
-    return slices, weights
+        maxweights.append(upper)
+        minweights.append(lower)
+    return slices, maxweights, minweights
 
 
 def get_split_rows_method(split_rows: str) -> SplitRowsFunc:

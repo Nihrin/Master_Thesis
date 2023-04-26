@@ -81,8 +81,12 @@ def is_smooth(root: Node, sum_nodes: Optional[List[Sum]] = None) -> Optional[str
         #     return "Weights of node #{} don't sum up to 1".format(node.id)
         if len(node.children) == 0:
             return "Sum node #{} has no children".format(node.id)
-        if len(node.children) != len(node.weights):
-            return "Weights and children length mismatch in node #{}".format(node.id)
+        if np.any(node.weights):
+            if len(node.children) != len(node.weights):
+                return "Weights and children length mismatch in node #{}".format(node.id)
+        else:
+            if len(node.children) != len(node.maxweights):
+                return "Weights and children length mismatch in node #{}".format(node.id)
         if any(map(lambda c: set(c.scope) != set(node.scope), node.children)):
             return "Children of Sum node #{} have different scopes".format(node.id)
     return None

@@ -58,19 +58,20 @@ def prune(root: Node, copy: bool = True) -> Node:
                 children.extend(product_children)
             nodes_map[node.id].children = children
         elif isinstance(node, Sum):
+            ...
             # Subsequent sum nodes, concatenate the children of them and adjust the weights accordingly
             # Important! This implementation take care also of directed acyclic graphs (DAGs)
-            children_weights = defaultdict(float)
-            for i, child in enumerate(children_nodes):
-                if not isinstance(child, Sum):
-                    children_weights[child] += node.weights[i]
-                    continue
-                sum_children = map(lambda n: nodes_map[n.id], child.children)
-                for j, sum_child in enumerate(sum_children):
-                    children_weights[sum_child] += node.weights[i] * child.weights[j]
-            children, weights = zip(*children_weights.items())
-            nodes_map[node.id].weights = np.array(weights, dtype=node.weights.dtype)
-            nodes_map[node.id].children = children
+            # children_weights = defaultdict(float)
+            # for i, child in enumerate(children_nodes):
+            #     if not isinstance(child, Sum):
+            #         children_weights[child] += node.weights[i]
+            #         continue
+            #     sum_children = map(lambda n: nodes_map[n.id], child.children)
+            #     for j, sum_child in enumerate(sum_children):
+            #         children_weights[sum_child] += node.weights[i] * child.weights[j]
+            # children, weights = zip(*children_weights.items())
+            # nodes_map[node.id].weights = np.array(weights, dtype=node.weights.dtype)
+            # nodes_map[node.id].children = children
         else:
             raise ValueError("Unknown node type called {}".format(node.__class__.__name__))
 

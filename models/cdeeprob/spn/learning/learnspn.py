@@ -167,7 +167,10 @@ def learn_spn(
         elif op == OperationKind.CREATE_LEAF:
             # Create a leaf node
             dists, doms = [distributions[s] for s in task.scope], [domains[s] for s in task.scope]
-            data = task.data[~np.isnan(task.data)]
+            if np.isnan(task.data).any():
+                data = task.data[~np.isnan(task.data)]
+            else:
+                data = task.data
             leaf = learn_leaf_func(data, dists, doms, task.scope, **learn_leaf_kwargs)
             task.parent.children.append(leaf)
         elif op == OperationKind.SPLIT_NAIVE:
@@ -185,10 +188,12 @@ def learn_spn(
             if not nans.any():
                 clusters = split_rows_func(task.data, dists, doms, random_state, **split_rows_kwargs)
                 slices, weights = split_rows_clusters(task.data, clusters)
+                node = Sum(task.scope, weights=weights)
             else:
                 split_data = task.data[~np.isnan(task.data).any(axis=1), :]
                 clusters =  split_rows_func(split_data, dists, doms, random_state, **split_rows_kwargs)
-                slices, weights = split_rows_clusters_credal(split_data, nans, clusters)
+                slices, maxweights, minweights = split_rows_clusters_credal(split_data, nans, clusters)
+                node = Sum(task.scope, maxweights=maxweights, minweights=minweights, weights=maxweights)
 
             # Check whether only one partitioning is returned
             if len(slices) == 1:
@@ -196,7 +201,7 @@ def learn_spn(
                 continue
 
             # Add sub-tasks and append Sum node
-            node = Sum(task.scope, weights=weights)
+            
             for local_data in slices:
                 tasks.append(Task(node, local_data, task.scope))
             task.parent.children.append(node)

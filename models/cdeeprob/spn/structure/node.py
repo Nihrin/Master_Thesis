@@ -54,6 +54,8 @@ class Sum(Node):
         self,
         scope: Optional[List[int]] = None,
         children: Optional[List[Node]] = None,
+        maxweights: Optional[Union[List[float], np.ndarray]] = None,
+        minweights: Optional[Union[List[float], np.ndarray]] = None,
         weights: Optional[Union[List[float], np.ndarray]] = None,
     ):
         """
@@ -82,9 +84,16 @@ class Sum(Node):
         if weights is not None:
             if isinstance(weights, list):
                 weights = np.array(weights, dtype=np.float32)
-            # if not (weights[0][0] + weights[1][1] == 1):
-            #     raise ValueError("Weights don't sum up to 1")
+        if maxweights is not None:
+            if isinstance(maxweights, list):
+                maxweights = np.array(maxweights, dtype=np.float32)
+        if minweights is not None:
+            if isinstance(minweights, list):
+                minweights = np.array(minweights, dtype=np.float32)
+
         self.weights = weights
+        self.maxweights = maxweights
+        self.minweights = minweights
 
         super().__init__(scope, children)
 
@@ -115,6 +124,34 @@ class Sum(Node):
 
     def log_likelihood(self, x: np.ndarray) -> np.ndarray:
         return logsumexp(x, b=self.weights, axis=1, keepdims=True)
+
+    def min_log_likelihood(self, x: np.ndarray) -> np.ndarray:
+        if self.maxweights is not None:
+            if self.maxweights.any():
+                weights = list()
+                max_idx = np.argmax(x, axis=1)
+                for i in max_idx:
+                    if i == 0:
+                        weights.append([self.minweights[0], self.maxweights[1]])
+                    else:
+                        weights.append([self.maxweights[0], self.minweights[1]])
+        else:
+            weights = self.weights
+        return logsumexp(x, b=weights, axis=1, keepdims=True)
+
+    def max_log_likelihood(self, x: np.ndarray) -> np.ndarray:
+        if self.maxweights is not None:
+            if self.maxweights.any():
+                weights = list()
+                max_idx = np.argmax(x, axis=1)
+                for i in max_idx:
+                    if i == 0:
+                        weights.append([self.maxweights[0], self.minweights[1]])
+                    else:
+                        weights.append([self.minweights[0], self.maxweights[1]])
+        else:
+            weights = self.weights
+        return logsumexp(x, b=weights, axis=1, keepdims=True)
 
 
 class Product(Node):
@@ -150,6 +187,12 @@ class Product(Node):
         return np.prod(x, axis=1, keepdims=True)
 
     def log_likelihood(self, x: np.append) -> np.ndarray:
+        return np.sum(x, axis=1, keepdims=True)
+    
+    def min_log_likelihood(self, x: np.append) -> np.ndarray:
+        return np.sum(x, axis=1, keepdims=True)
+
+    def max_log_likelihood(self, x: np.append) -> np.ndarray:
         return np.sum(x, axis=1, keepdims=True)
 
 

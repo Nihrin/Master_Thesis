@@ -4,10 +4,14 @@ import pandas as pd
 # import deeprob.spn.structure as spn
 
 from cdeeprob.spn.learning import learnspn
+from scipy.special import logsumexp
 
+print(logsumexp(a=[[-1, -2],[-1,-2]],b=[[0,1],[1,0]], axis=1, keepdims=True))
 
-
-
+# weights = np.array([0.35238096, 0.2952381, 0.35238096])
+# lls = np.array([[-1.27634537e+02, 5.27358130e-02, -4.60587025e+00],[-8.34535956e-01, -3.12715569e+01, -5.35779495e+01]])
+# print(np.log(np.sum(weights * np.exp(lls))))
+# print(logsumexp(a=lls, b=weights, axis=1, keepdims=True))
 
 # iris_names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
 # iris_data = pd.read_csv('UCI_data/iris.data', names=iris_names)

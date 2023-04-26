@@ -8,7 +8,7 @@ from sklearn.base import BaseEstimator, DensityMixin, ClassifierMixin
 
 from cdeeprob.spn.structure.leaf import Leaf, Bernoulli, Categorical
 from cdeeprob.spn.learning.wrappers import learn_estimator, learn_classifier
-from cdeeprob.spn.algorithms.inference import log_likelihood, mpe
+from cdeeprob.spn.algorithms.inference import log_likelihood, min_log_likelihood, max_log_likelihood, mpe
 from cdeeprob.spn.algorithms.sampling import sample
 
 
@@ -159,11 +159,29 @@ class SPNClassifier(BaseEstimator, ClassifierMixin):
         # Build the testing data, having X as features assignments and NaNs for labels
         data = np.hstack([X, np.full([len(X), 1], np.nan)])
 
-        # Make classification using maximum probable explanation (MPE)
-        mpe(self.spn_, data, inplace=True)
+        _, minll = min_log_likelihood(self.spn_, data, return_results=True)
+        _, maxll = max_log_likelihood(self.spn_, data, return_results=True)
+        
+        minclass = minll[1:self.n_classes_+1].T
+        maxclass = maxll[1:self.n_classes_+1].T
+        
+        minp = minclass * self.spn_.weights
+        maxp = maxclass * self.spn_.weights
+        maxidx = np.argmax(maxp, axis=1)
+        
+        predictions = list()
+        for m, i in zip(minp, maxidx):
+            if max(m) == m[i]:
+                predictions.append(i)
+            else:
+                preds = list()
+                for c in range(len(m)):
+                    if m[c] >= m[i]:
+                        preds.append(c)
+                predictions.append(preds)
 
         # Return the classifications for each sample
-        return data[:, -1]
+        return predictions
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         """

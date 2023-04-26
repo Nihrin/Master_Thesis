@@ -180,6 +180,8 @@ def learn_naive_factorization(
 
     node = Product(scope)
     for i, s in enumerate(scope):
+        if type(data[0]) != np.ndarray:
+            data = data.T
         leaf = learn_leaf_func(data[:, [i]], [distributions[i]], [domains[i]], [s], **learn_leaf_kwargs)
         leaf.id = i + 1  # Set the leaves ids sequentially
         node.children.append(leaf)
