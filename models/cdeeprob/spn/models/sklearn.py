@@ -102,7 +102,7 @@ class SPNEstimator(BaseEstimator, DensityMixin):
         }
 
 
-class SPNClassifier(BaseEstimator, ClassifierMixin):
+class CSPNClassifier(BaseEstimator, ClassifierMixin):
     def __init__(
         self,
         distributions: List[Type[Leaf]],

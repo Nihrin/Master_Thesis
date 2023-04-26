@@ -1,9 +1,11 @@
 import pandas as pd
 import models.naive as naive
 import models.tree as tree
+import models.SPN as SPN
 import helper_functions
 import math
 from sklearn.model_selection import train_test_split
+from sklearn.datasets import load_iris
 
 
 def run_naive_classifiers(X, y, missing):
@@ -69,51 +71,29 @@ def tree_classifiers(X, y, missing: int = 0, runs: int = 10):
 def run():
     MISSING_DATA = 30
     CROSS_VALIDATION = 10
-
-    # iris_names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
-    # iris_data = pd.read_csv('UCI_data/iris.data', names=iris_names)
-    # iris_y = iris_data['classes']
-    # iris_X = iris_data.drop(['classes'], axis=1)
+    iris_names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
+    iris_data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/UCI_data/iris.data', names=iris_names)
+    iris_y = iris_data['classes']
+    iris_X = iris_data.drop(['classes'], axis=1)
+    X_train, X_test, y_train, y_test = train_test_split(iris_X, iris_y, test_size=0.30)
+    X_train = helper_functions.create_missing_data(X_train, MISSING_DATA)
+    X_train = X_train.to_numpy()
+    y_train = y_train.to_numpy()
+    # change y_train
+    X_test = X_test.to_numpy()
+    y_test = y_test.to_numpy()
+    y_pred = SPN.SPN(X_train, y_train, X_test, random_state=42)
+    print(y_test)
+    print(y_pred)
     # naive_classifiers(iris_X, iris_y, MISSING_DATA, CROSS_VALIDATION)
     # pred, y_true = 
     # print(y_true.to_list())
     # print(pred)
 
-    balance_names = ['classes', 'left-weight', 'left-distance', 'right-weight', 'right-distance']
-    balance_data = pd.read_csv('UCI_data/balance-scale.data', names=balance_names)
-    balance_y = balance_data['classes']
-    balance_X = balance_data.drop(['classes'], axis=1)
-    naive_classifiers(balance_X, balance_y, MISSING_DATA, CROSS_VALIDATION)
+    # balance_names = ['classes', 'left-weight', 'left-distance', 'right-weight', 'right-distance']
+    # balance_data = pd.read_csv('UCI_data/balance-scale.data', names=balance_names)
+    # balance_y = balance_data['classes']
+    # balance_X = balance_data.drop(['classes'], axis=1)
+    # naive_classifiers(balance_X, balance_y, MISSING_DATA, CROSS_VALIDATION)
 
-    # print('Iris')
-    # naive_classifiers(iris_X, iris_y, missing_data, cross_validations)
-    # print()
-    # print('Balance')
-    # naive_classifiers(balance_X, balance_y, missing_data, cross_validations)
-
-    # weather_names = ['Outlook', 'Temperature', 'Humidity', 'Wind', 'classes']
-    # weather_data = pd.read_csv('test_data/weka_weather.data', names=weather_names)
-    # weather_y = weather_data['classes']
-    # weather_X = weather_data.drop(['classes'], axis=1)
-    # pred = tree_classifiers(weather_X, weather_y,
-    #                         MISSING_DATA, CROSS_VALIDATION)
-    # print(weather_y.to_list())
-    # print(pred)
-
-    # names = ['X1', 'X2', 'classes']
-    # data = pd.read_csv('test_data/paper_example.data', names=names)
-    # y = data['classes']
-    # X = data.drop(['classes'], axis=1)
-    # pred, y_true = tree_classifiers(X, y, MISSING_DATA, CROSS_VALIDATION)
-
-    # count = 0
-    # for a, b in zip(pred, y_true.to_list()):
-    #     if a == b:
-    #         count += 1
-    # print(count, 'out of', len(pred), 'correct')
-
-
-# helper_functions.create_names_dict()
-# names_dict = helper_functions.open_names_dict()
-# print(names_dict)
 run()
