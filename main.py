@@ -1,51 +1,29 @@
 import pandas as pd
+import numpy as np
 import models.naive as naive
 import models.tree as tree
 import models.SPN as SPN
 import helper_functions
 import math
 from sklearn.model_selection import train_test_split
-from sklearn.datasets import load_iris
+import os
+import random
 
-
-def run_naive_classifiers(X, y, missing):
-    if missing > 0:
-        X = helper_functions.create_missing_data(X, missing)
-        X = X.fillna(X.mean())
-
+def run_naive_classifiers(X_train, X_test, y_train, y_test):
     NBC = naive.NBC()
-    NBC.train(X, y)
-    NBC_predictions = NBC.predict(X)
+    NBC.train(X_train, y_train)
+    NBC_predictions = NBC.predict(X_test)
 
-    s = 2
+    NBC_acc = helper_functions.classical_accuracies(NBC_predictions, y_test)
+
+    s = 1
     NCC = naive.NCC()
-    NCC.train(X, y, s)
-    NCC_predictions = NCC.predict(X)
+    NCC.train(X_train, y_train, s)
+    NCC_predictions = NCC.predict(X_test)
 
-    NBC_acc, NCC_acc, NCC_d_acc, NCC_r_acc = helper_functions.accuracies(
-        y, NBC_predictions, NCC_predictions)
+    NCC_acc_interval, NCC_robust_acc = helper_functions.credal_accuracies(NCC_predictions, y_test)
 
-    return NBC_acc, NCC_acc, NCC_d_acc, NCC_r_acc
-
-
-def naive_classifiers(X, y, missing: int = 0, runs: int = 10):
-    NBC_acc_list, NCC_acc_list, NCC_d_acc_list, NCC_r_acc_list = list(
-    ), list(), list(), list()
-
-    for _ in range(runs):
-        NBC_acc, NCC_acc, NCC_d_acc, NCC_r_acc = run_naive_classifiers(
-            X.copy(), y, missing)
-        NBC_acc_list.append(NBC_acc)
-        NCC_acc_list.append(NCC_acc)
-        NCC_d_acc_list.append(NCC_d_acc)
-        NCC_r_acc_list.append(NCC_r_acc)
-    
-    print("Overview:")
-    print("NBC_acc: " + str("%.2f" % (math.fsum(NBC_acc_list) / runs)) + '%')
-    print("NCC_lower_acc: " + str("%.2f" % (math.fsum(NCC_acc_list) / runs)) + '%')
-    print("NCC_upper_acc: " + str("%.2f" % (math.fsum(NCC_d_acc_list) / runs)) + '%')
-    print("NCC_r_acc: " + str("%.2f" % (math.fsum(NCC_r_acc_list) / runs)) + '%')
-
+    return NBC_acc, NCC_acc_interval, NCC_robust_acc
 
 def run_tree_classifiers(X, y, missing):
     if missing > 0:
@@ -67,15 +45,43 @@ def tree_classifiers(X, y, missing: int = 0, runs: int = 10):
     pred = run_tree_classifiers(X, y, missing)
     return pred
 
+def run_experiment1(data: pd.DataFrame, filename: str):
+    missing_data = [0, 5, 10, 20, 30]
+    cross_validations = 10
+    y = data['classes']
+    y = pd.factorize(y)[0]
+    X = data.drop(['classes'], axis=1)
 
-def run():
+    reproduction_dict = dict()
+
+    for percentage in missing_data:
+        for run in range(cross_validations):
+            random_state_int = random.randint(0, 20000)
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=random_state_int)
+            X_train, random_state_missing = helper_functions.create_missing_data(X_train, percentage)
+            NBC_acc, NCC_acc_interval, NCC_robust_acc = run_naive_classifiers(X_train, X_test, y_train, y_test)
+            print(NBC_acc, NCC_acc_interval, NCC_robust_acc)
+            exit()
+            tree_acc, credal_tree_acc = run_tree_classifiers(X_train, X_test, y_train, y_test)
+            # SPN_acc, CSPN_acc_interval, CSPN_robust_acc = run_SPN_classifiers(X_train, X_test, y_train, y_test)
+            reproduction_dict[(filename, missing_data, run)] = (random_state_int, random_state_missing)
+
+def experiment1():
+    abs_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/UCI_data/'
+    col_names = helper_functions.get_names_dict()
+
+    for filename in os.listdir(abs_path):
+        data = pd.read_csv(abs_path + filename, names=col_names[filename])
+        run_experiment1(data, filename)
+
+    exit()
+
     MISSING_DATA = 30
     CROSS_VALIDATION = 10
     RANDOM_STATE = 42
 
-    iris_names = ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']
-    iris_data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/UCI_data/iris.data', names=iris_names)
     iris_y = iris_data['classes']
+    iris_y = pd.factorize(iris_y)[0]
     iris_X = iris_data.drop(['classes'], axis=1)
 
     X_train, X_test, y_train, y_test = train_test_split(iris_X, iris_y, test_size=0.30, random_state=RANDOM_STATE)
@@ -94,10 +100,4 @@ def run():
     # print(y_true.to_list())
     # print(pred)
 
-    # balance_names = ['classes', 'left-weight', 'left-distance', 'right-weight', 'right-distance']
-    # balance_data = pd.read_csv('UCI_data/balance-scale.data', names=balance_names)
-    # balance_y = balance_data['classes']
-    # balance_X = balance_data.drop(['classes'], axis=1)
-    # naive_classifiers(balance_X, balance_y, MISSING_DATA, CROSS_VALIDATION)
-
-run()
+experiment1()

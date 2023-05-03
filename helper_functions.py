@@ -5,6 +5,8 @@ import pickle
 
 
 def create_missing_data(data: pd.DataFrame, percentage, random_state=None):
+    if percentage <= 0:
+        return data, random_state
     if random_state == None:
         random_state = random.getstate()
     cells = set()
@@ -25,43 +27,40 @@ def create_missing_data(data: pd.DataFrame, percentage, random_state=None):
     return data, random_state
 
 
-def accuracies(y, classical_predictions, credal_predictions):
-    classical_accuracy = (sum(1 for a, b in zip(classical_predictions, y)
-                              if a == b) / len(y)) * 100
-    # print('Classical accuracy: ' + str("%.2f" % classical_accuracy) + '%')
+def classical_accuracies(y_pred, y_test):
+    accuracy = (sum(1 for a, b in zip(y_pred, y_test)
+                              if a == b) / len(y_test)) * 100
+    return accuracy
 
-    credal_accuracy = (sum(1 for a, b in zip(credal_predictions, y)
-                           if a == b) / len(y)) * 100
-    # print('Credal accuracy: ' + str("%.2f" % credal_accuracy) + '%')
+def credal_accuracies(y_pred, y_test):
+    low_correct = 0
+    up_correct = 0
+    robust_count = 0
+    for a, b in zip(y_pred, y_test):
+        if type(a) is list:
+            if b in a:
+                up_correct += 1
+        elif a == b:
+            low_correct += 1
+            up_correct += 1
+            robust_count += 1
+        else:
+            robust_count += 1       
 
-    d_correct = 0
-    r_correct = 0
-    r_count = 0
-    for a, b in zip(credal_predictions, y):
-        if a == b:
-            d_correct += 1
-            r_correct += 1
-            r_count += 1
-        elif b in a:
-            d_correct += 1
-        elif type(a) != list():
-            r_count += 1
-    discounted_credal_accuracy = (d_correct / len(y)) * 100
-    robust_credal_accuracy = (r_correct / r_count) * 100
+    low_acc = (low_correct / len(y_test)) * 100
+    up_acc = (up_correct / len(y_test)) * 100
+    robust_acc = (low_correct / robust_count) * 100
 
-    return classical_accuracy, credal_accuracy, discounted_credal_accuracy, robust_credal_accuracy
+    return (low_acc, up_acc), robust_acc
 
-
-def create_names_dict():
+def get_names_dict():
     dict = {
-        'balance-scale': ['classes', 'left-weight', 'left-distance', 'right-weight', 'right-distance'],
-        'iris': ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes']      
+        'balance-scale.data': ['classes', 'left-weight', 'left-distance', 'right-weight', 'right-distance'],
+        'car.data': ['buying', 'maint', 'doors', 'persons', 'lug_boot', 'safety', 'classes'],
+        'cmc.data': ['age', 'education_w', 'education_h', 'children', 'religion', 'working', 'occupation_h', 'solindex', 'media', 'classes'],
+        'german-credit.data': ['status', 'duration', 'history', 'purpose', 'amount', 'savings', 'employment', 'installmentrate', 'personalstatus', 'debtors', 'residence', 'property', 'age', 'installmentplans', 'housing', 'existingcredits', 'job', 'numpeople', 'telephone', 'foreign', 'classes'],
+        'iris.data': ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes'],
+        'wdbc.data': ['classes', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
+        'wine.data': ['classes', 'alcohol', 'malicacid', 'ash', 'alcalinityash', 'magnesium', 'phenols', 'flavanoids', 'nonflavphenols', 'proanthocyanins', 'colorintense', 'hue', 'diluted', 'proline']
     }
-    with open('UCI_data_names.pkl', 'wb') as f:
-        pickle.dump(dict, f)
-
-
-def open_names_dict():
-    with open('UCI_data_names.pkl', 'rb') as f:
-        dict = pickle.load(f)
     return dict
