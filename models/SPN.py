@@ -12,8 +12,8 @@ def SPN(X_train, y_train, X_test, random_state):
     clf = SPNClassifier(
         distributions,
         learn_leaf='mle',     # Learn leaf distributions by MLE
-        split_rows='gmm',  # Use K-Means for splitting rows
-        split_cols='gvs',     # Use RDC for splitting columns
+        split_rows='gmm',     # Use K-Means for splitting rows
+        split_cols='gvs',     # Use GVS for splitting columns
         min_rows_slice=15,    # The minimum number of rows required to split furthermore
         random_state=random_state,       # The random state, used for reproducibility
         verbose=False
@@ -30,8 +30,8 @@ def CSPN(X_train, y_train, X_test, random_state):
     clf = CSPNClassifier(
         distributions,
         learn_leaf='mle',     # Learn leaf distributions by MLE
-        split_rows='gmm',  # Use K-Means for splitting rows
-        split_cols='gvs',     # Use RDC for splitting columns
+        split_rows='gmm',     # Use K-Means for splitting rows
+        split_cols='gvs',     # Use GVS for splitting columns
         min_rows_slice=15,    # The minimum number of rows required to split furthermore
         random_state=random_state,       # The random state, used for reproducibility
         verbose=False
