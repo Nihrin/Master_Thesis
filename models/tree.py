@@ -59,6 +59,7 @@ class C45:
     def gain_criterion(self, data: pd.DataFrame):
         best_threshold = None
         best_gain = -math.inf
+        best_attribute = None
         overall_entropy = self.entropy(data)
         for attribute in data.columns[:-1]:
             if check_discrete(data[attribute]):
@@ -82,7 +83,10 @@ class C45:
             pred = y.unique()[0]
             return Leaf(pred)
         split_attribute, threshold = self.gain_criterion(data)
-        if threshold == None:
+        if split_attribute == None:
+            pred = y.mode()[0]
+            return Leaf(pred)
+        elif threshold == None:
             categories = data[split_attribute].unique()
             node = CategoricalNode(split_attribute, categories)
             for cat in categories:
@@ -96,9 +100,11 @@ class C45:
                 data[data[split_attribute] > threshold]))
         return node
 
-    def train(self, X: pd.DataFrame, y: pd.DataFrame):
-        self.data = X.join(y)
-        self.classes = y.unique()
+    def train(self, X: pd.DataFrame, y):
+        X = X.reset_index(drop=True)
+        X['classes'] = pd.Series(y)
+        self.data = X
+        self.classes = X['classes'].unique()
         self.attributes = X.columns
         self.tree = self.generate_tree(self.data)
 
@@ -228,6 +234,7 @@ class CredalC45:
     def gain_criterion(self, data: pd.DataFrame):
         best_threshold = None
         best_gain = -math.inf
+        best_attribute = None
         overall_entropy = self.entropy(data)
         for attribute in data.columns[:-1]:
             if check_discrete(data[attribute]):
@@ -265,9 +272,11 @@ class CredalC45:
                 data[data[split_attribute] > threshold]))
         return node
 
-    def train(self, X: pd.DataFrame, y: pd.DataFrame, s):
-        self.data = X.join(y)
-        self.classes = y.unique()
+    def train(self, X: pd.DataFrame, y, s):
+        X = X.reset_index(drop=True)
+        X['classes'] = pd.Series(y)
+        self.data = X
+        self.classes = X['classes'].unique()
         self.attributes = X.columns
         self.s = s
         self.tree = self.generate_tree(self.data)
@@ -327,6 +336,8 @@ def check_discrete(column: pd.DataFrame):
 
 
 def split_info(N, n):
+    if n == 0:
+        return 0
     return -(n/N) * math.log2(n/N)
 
 
