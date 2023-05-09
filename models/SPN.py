@@ -1,13 +1,7 @@
-import cdeeprob.spn.structure as cspn
 from cdeeprob.spn.models.sklearn import CSPNClassifier
-
-import deeprob.spn.structure as spn
 from deeprob.spn.models.sklearn import SPNClassifier
 
-def SPN(X_train, y_train, X_test, random_state):
-    _, n_features = X_train.shape
-    distributions = [spn.Gaussian] * (n_features)
-
+def SPN(X_train, X_test, y_train, distributions, random_state):
     # Instantiate and fit a SPN classifier
     clf = SPNClassifier(
         distributions,
@@ -22,10 +16,7 @@ def SPN(X_train, y_train, X_test, random_state):
     y_pred = clf.predict(X_test)
     return y_pred
     
-def CSPN(X_train, y_train, X_test, random_state):
-    _, n_features = X_train.shape
-    distributions = [cspn.Gaussian] * (n_features)
-
+def CSPN(X_train, X_test, y_train, distributions, random_state):
     # Instantiate and fit a SPN classifier
     clf = CSPNClassifier(
         distributions,

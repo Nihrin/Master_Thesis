@@ -1,7 +1,8 @@
 import pandas as pd
 import math
 import random
-import pickle
+import deeprob.spn.structure as spn
+import cdeeprob.spn.structure as cspn
 
 
 def create_missing_data(data: pd.DataFrame, percentage, random_state=None):
@@ -62,5 +63,29 @@ def get_names_dict():
         'iris.data': ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes'],
         'wdbc.data': ['classes', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
         'wine.data': ['classes', 'alcohol', 'malicacid', 'ash', 'alcalinityash', 'magnesium', 'phenols', 'flavanoids', 'nonflavphenols', 'proanthocyanins', 'colorintense', 'hue', 'diluted', 'proline']
+    }
+    return dict
+
+def get_spn_distributions():
+    dict = {
+        'balance-scale.data': [spn.Categorical] * 4,
+        'car.data': [spn.Categorical] * 6,
+        'cmc.data': [spn.Gaussian, spn.Categorical, spn.Categorical, spn.Gaussian, spn.Categorical, spn.Categorical, spn.Categorical, spn.Gaussian, spn.Categorical],
+        'german-credit.data': [],
+        'iris.data': [spn.Gaussian] * 4,
+        'wdbc.data': [],
+        'wine.data': []
+    }
+    return dict
+
+def get_cspn_distributions():
+    dict = {
+        'balance-scale.data': [cspn.Categorical] * 4,
+        'car.data': [cspn.Categorical] * 6,
+        'cmc.data':  [cspn.Gaussian, cspn.Categorical, cspn.Categorical, cspn.Gaussian, cspn.Categorical, cspn.Categorical, cspn.Categorical, cspn.Gaussian, cspn.Categorical],
+        'german-credit.data': [],
+        'iris.data': [cspn.Gaussian] * 4,
+        'wdbc.data': [],
+        'wine.data': []
     }
     return dict

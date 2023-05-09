@@ -42,7 +42,10 @@ class NBC:
         for i in range(len(self.X_train.columns)):
             col_name = self.X_train.columns[i]
             value = values[i]
-            prob = prob * self.likelihood[col_name][value][c]
+            try:
+                prob = prob * self.likelihood[col_name][value][c]
+            except:
+                prob = 0
         return prob
 
     def get_prior(self, c):
@@ -60,7 +63,10 @@ class NBC:
             col_name = self.X_train.columns[i]
             value = values[i]
             for x in classes:
-                p += self.likelihood[col_name][value][x]
+                try:
+                    p += self.likelihood[col_name][value][x]
+                except:
+                    p += 0
             likelihood = likelihood * p
         marginal = prior * likelihood
         return marginal
@@ -125,7 +131,10 @@ class NCC:
         for i in range(len(self.X_train.columns)):
             col_name = self.X_train.columns[i]
             value = values[i]
-            prob = prob * self.likelihood[col_name][value][c]
+            try:
+                prob = prob * self.likelihood[col_name][value][c]
+            except:
+                prob = 0
         return prob
 
     def get_prior(self, c):
@@ -143,7 +152,10 @@ class NCC:
             col_name = self.X_train.columns[i]
             value = values[i]
             for x in classes:
-                p += self.likelihood[col_name][value][x]
+                try:
+                    p += self.likelihood[col_name][value][x]
+                except:
+                    p += 0
             likelihood = likelihood * p
         marginal = prior * likelihood
         return marginal

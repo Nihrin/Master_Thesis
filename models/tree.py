@@ -258,6 +258,8 @@ class CredalC45:
             pred = y.unique()[0]
             return Leaf(pred)
         split_attribute, threshold = self.gain_criterion(data)
+        if split_attribute == None:
+            return Leaf(None)
         if threshold == None:
             categories = data[split_attribute].unique()
             node = CategoricalNode(split_attribute, categories)
