@@ -1,10 +1,8 @@
 import pandas as pd
-import numpy as np
 import models.naive as naive
 import models.tree as tree
 import models.SPN as SPN
 import helper_functions
-import math
 from sklearn.model_selection import train_test_split
 import os
 import random
@@ -26,9 +24,9 @@ def run_naive_classifiers(X_train, X_test, y_train, y_test):
     NCC.train(X_train, y_train, s)
     NCC_predictions = NCC.predict(X_test)
 
-    NCC_acc_interval, NCC_robust_acc = helper_functions.credal_accuracies(NCC_predictions, y_test)
+    NCC_acc_low, NCC_acc_high, NCC_robust_acc = helper_functions.credal_accuracies(NCC_predictions, y_test)
 
-    return NBC_acc, NCC_acc_interval, NCC_robust_acc
+    return NBC_acc, NCC_acc_low, NCC_acc_high, NCC_robust_acc
 
 def run_tree_classifiers(X_train, X_test, y_train, y_test):
     classical_tree = tree.C45()
@@ -48,18 +46,18 @@ def run_SPN_classifiers(X_train, X_test, y_train, y_test, distributions, random_
     X_train_num = X_train.to_numpy()
 
     credal_predictions = SPN.CSPN(X_train_num, X_test_num, y_train, distributions[1], random_state)
-    credal_acc_interval, credal_robust_acc = helper_functions.credal_accuracies(credal_predictions, y_test)
+    credal_acc_low, credal_acc_high, credal_robust_acc = helper_functions.credal_accuracies(credal_predictions, y_test)
 
     X_train = X_train.fillna(X_train.mean())
     X_train_num = X_train.to_numpy()
     classical_predictions = SPN.SPN(X_train_num, X_test_num, y_train, distributions[0], random_state)
     classical_acc = helper_functions.classical_accuracies(classical_predictions, y_test)
 
-    return classical_acc, credal_acc_interval, credal_robust_acc
+    return classical_acc, credal_acc_low, credal_acc_high, credal_robust_acc
 
 def run_experiment1(data: pd.DataFrame, filename: str):
     missing_data = [0, 5, 10, 20, 30]
-    cross_validations = 10
+    cross_validations = 30
     y = data['classes']
     y = pd.factorize(y)[0]
     X = data.drop(['classes'], axis=1)
@@ -68,32 +66,40 @@ def run_experiment1(data: pd.DataFrame, filename: str):
     spn_distribution = helper_functions.get_spn_distributions()[filename]
     cspn_distribution = helper_functions.get_cspn_distributions()[filename]
     distributions = [spn_distribution, cspn_distribution]
-
+    naive_df = pd.DataFrame(columns=['%-missing', 'classic-acc', 'credal-low', 'credal-high', 'credal-robust'])
+    tree_df = pd.DataFrame(columns=['%-missing', 'classic-acc', 'credal-acc'])
+    spn_df = pd.DataFrame(columns=['%-missing', 'classic-acc', 'credal-low', 'credal-high', 'credal-robust'])
     for percentage in missing_data:
         for run in range(cross_validations):
-            print('run', run+1)
+            if (run+1) % 10 == 0 or run == 0:
+                print('Missing', percentage, 'Run', run+1)
             random_state_int = random.randint(0, 20000)
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=random_state_int)
             X_train, random_state_missing = helper_functions.create_missing_data(X_train, percentage)
-            NBC_acc, NCC_acc_interval, NCC_robust_acc = run_naive_classifiers(X_train, X_test, y_train, y_test)
-            print(NBC_acc, NCC_acc_interval, NCC_robust_acc)
+            NBC_acc, NCC_acc_low, NCC_acc_high, NCC_robust_acc = run_naive_classifiers(X_train, X_test, y_train, y_test)
             tree_acc, credal_tree_acc = run_tree_classifiers(X_train, X_test, y_train, y_test)
-            print(tree_acc, credal_tree_acc)
-            SPN_acc, CSPN_acc_interval, CSPN_robust_acc = run_SPN_classifiers(X_train, X_test, y_train, y_test, distributions, random_state_int)
-            print(SPN_acc, CSPN_acc_interval, CSPN_robust_acc)
-            # reproduction_dict[(filename, missing_data, run)] = (random_state_int, random_state_missing)
+            SPN_acc, CSPN_acc_low, CSPN_acc_high, CSPN_robust_acc = run_SPN_classifiers(X_train, X_test, y_train, y_test, distributions, random_state_int)
+
+            naive_df.loc[len(naive_df)] = [percentage, NBC_acc, NCC_acc_low, NCC_acc_high, NCC_robust_acc]
+            tree_df.loc[len(tree_df)] = [percentage, tree_acc, credal_tree_acc]
+            spn_df.loc[len(spn_df)] = [percentage, SPN_acc, CSPN_acc_low, CSPN_acc_high, CSPN_robust_acc]
+
+    print(naive_df.groupby(['%-missing']).mean())
+    print(tree_df.groupby(['%-missing']).mean())
+    print(spn_df.groupby(['%-missing']).mean())
+
     exit()
 
+            # reproduction_dict[(filename, missing_data, run)] = (random_state_int, random_state_missing)
+
+
 def experiment1():
-    abs_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/UCI_data/'
+    abs_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp1/'
     col_names = helper_functions.get_names_dict()
 
     for filename in os.listdir(abs_path):
-        filename = 'iris.data'
+        print('Running', filename)
         data = pd.read_csv(abs_path + filename, names=col_names[filename])
         run_experiment1(data, filename)
-        exit()
-
-    exit()
 
 experiment1()

@@ -52,7 +52,7 @@ def credal_accuracies(y_pred, y_test):
     up_acc = (up_correct / len(y_test)) * 100
     robust_acc = (low_correct / robust_count) * 100
 
-    return (low_acc, up_acc), robust_acc
+    return low_acc, up_acc, robust_acc
 
 def get_names_dict():
     dict = {
