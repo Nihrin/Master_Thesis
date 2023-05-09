@@ -71,8 +71,6 @@ def run_experiment1(data: pd.DataFrame, filename: str):
     spn_df = pd.DataFrame(columns=['%-missing', 'classic-acc', 'credal-low', 'credal-high', 'credal-robust'])
     for percentage in missing_data:
         for run in range(cross_validations):
-            if (run+1) % 10 == 0 or run == 0:
-                print('Missing', percentage, 'Run', run+1)
             random_state_int = random.randint(0, 20000)
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=random_state_int)
             X_train, random_state_missing = helper_functions.create_missing_data(X_train, percentage)
@@ -84,13 +82,13 @@ def run_experiment1(data: pd.DataFrame, filename: str):
             tree_df.loc[len(tree_df)] = [percentage, tree_acc, credal_tree_acc]
             spn_df.loc[len(spn_df)] = [percentage, SPN_acc, CSPN_acc_low, CSPN_acc_high, CSPN_robust_acc]
 
-    print(naive_df.groupby(['%-missing']).mean())
-    print(tree_df.groupby(['%-missing']).mean())
-    print(spn_df.groupby(['%-missing']).mean())
-
-    exit()
-
             # reproduction_dict[(filename, missing_data, run)] = (random_state_int, random_state_missing)
+    print('Naive')
+    print(naive_df.groupby(['%-missing']).mean())
+    print('C4.5')
+    print(tree_df.groupby(['%-missing']).mean())
+    print('SPN')
+    print(spn_df.groupby(['%-missing']).mean())
 
 
 def experiment1():
