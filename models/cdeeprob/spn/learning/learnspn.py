@@ -146,7 +146,6 @@ def learn_spn(
         else:
             op = OperationKind.SPLIT_COLS
             
-
         if op == OperationKind.REM_FEATURES:
             node = Product(task.scope)
 
@@ -168,7 +167,7 @@ def learn_spn(
             # Create a leaf node
             dists, doms = [distributions[s] for s in task.scope], [domains[s] for s in task.scope]
             if np.isnan(task.data).any():
-                data = task.data[~np.isnan(task.data)]
+                data = task.data[~np.isnan(task.data).any(axis=1), :]
             else:
                 data = task.data
             leaf = learn_leaf_func(data, dists, doms, task.scope, **learn_leaf_kwargs)

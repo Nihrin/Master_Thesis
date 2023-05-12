@@ -31,6 +31,8 @@ def gmm(
     # Convert the data using One Hot Encoding, in case of non-binary discrete features
     if any(len(d) > 2 for d in domains):
         data = mixed_ohe_data(data, domains)
+    if len(data) == 1:
+        return [1]
 
     # Apply GMM
     with warnings.catch_warnings():

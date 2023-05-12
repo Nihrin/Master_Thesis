@@ -72,6 +72,8 @@ class NBC:
         return marginal
 
     def bayes(self, l, p, m):
+        if ((l * p) + m) == 0:
+            return 0
         post = l * p / ((l * p) + m)
         return post
 
@@ -161,7 +163,10 @@ class NCC:
         return marginal
 
     def bayes(self, l, p, m):
-        post = l * p / ((l * p) + m)
+        if ((l * p) + m) == 0:
+            post = 0
+        else:
+            post = l * p / ((l * p) + m)
         lower = post * (self.X_train.shape[0] / (self.X_train.shape[0] + self.s))
         upper = post * (self.X_train.shape[0] / (self.X_train.shape[0] + self.s)) + (self.s / (self.X_train.shape[0] + self.s))
         return (lower, upper)

@@ -193,18 +193,24 @@ def gtest(
     x1_ = np.delete(x1, indices1)
     x2_ = np.delete(x2, indices2)
 
-    if distributions[i].LEAF_TYPE == LeafType.DISCRETE and distributions[j].LEAF_TYPE == LeafType.DISCRETE:
-        b1 = domains[i] + [len(domains[i])]
-        b2 = domains[j] + [len(domains[j])]
-        histx1, x1edges = np.histogram(x1_, bins=[b1, b2])
-        histx2, x2edges = np.histogram(x2_, bins=[b1, b2])
-        lowhist, _, _ = np.histogram2d(lowx1, lowx2, bins=[b1, b2])
-    elif distributions[i].LEAF_TYPE == LeafType.CONTINUOUS and distributions[j].LEAF_TYPE == LeafType.CONTINUOUS:
-        histx1, x1edges = np.histogram(x1_, bins='scott')
-        histx2, x2edges = np.histogram(x2_, bins='scott')
-        lowhist, _, _ = np.histogram2d(lowx1, lowx2, bins=[x1edges, x2edges])
+    if distributions[i].LEAF_TYPE == LeafType.DISCRETE:
+        b1 = domains[i] + [domains[i][-1] + (domains[i][-1] - domains[i][-2])]
+        histx1, _ = np.histogram(x1_, bins=b1)
+    elif distributions[i].LEAF_TYPE == LeafType.CONTINUOUS:
+        histx1, b1 = np.histogram(x1_, bins='scott')     
     else:
-        raise ValueError("Leaves distributions must be either discrete or continuous")
+        raise ValueError("Leaf distribution must be either discrete or continuous")
+    
+    if distributions[j].LEAF_TYPE == LeafType.DISCRETE:
+        b2 = domains[j] + [domains[j][-1] + (domains[j][-1] - domains[j][-2])]
+        histx2, _ = np.histogram(x2_, bins=b2)
+    elif distributions[j].LEAF_TYPE == LeafType.CONTINUOUS:
+        histx2, b2 = np.histogram(x2_, bins='scott')
+    else:
+        raise ValueError("Leaf distribution must be either discrete or continuous")
+    
+    lowhist, _, _ = np.histogram2d(lowx1, lowx2, bins=[b1, b2])
+
     
     uphist = lowhist.copy()
     mr = np.sum(lowhist, axis=1, keepdims=True)

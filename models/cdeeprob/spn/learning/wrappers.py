@@ -112,6 +112,7 @@ def compute_data_domains(data: np.ndarray, distributions: List[Type[Leaf]]) -> L
     domains = []
     for i, d in enumerate(distributions):
         col = data[:, i]
+        col = col[~np.isnan(col)]
         if d.LEAF_TYPE == LeafType.DISCRETE:
             vals = np.unique(col).tolist()
             domains.append(vals)

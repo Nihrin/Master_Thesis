@@ -71,6 +71,7 @@ def run_experiment1(data: pd.DataFrame, filename: str):
     spn_df = pd.DataFrame(columns=['%-missing', 'classic-acc', 'credal-low', 'credal-high', 'credal-robust'])
     for percentage in missing_data:
         for run in range(cross_validations):
+            print('Missing', percentage, 'Run', run)
             random_state_int = random.randint(0, 20000)
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=random_state_int)
             X_train, random_state_missing = helper_functions.create_missing_data(X_train, percentage)
@@ -83,6 +84,7 @@ def run_experiment1(data: pd.DataFrame, filename: str):
             spn_df.loc[len(spn_df)] = [percentage, SPN_acc, CSPN_acc_low, CSPN_acc_high, CSPN_robust_acc]
 
             # reproduction_dict[(filename, missing_data, run)] = (random_state_int, random_state_missing)
+            
     print('Naive')
     print(naive_df.groupby(['%-missing']).mean())
     print('C4.5')
@@ -96,8 +98,15 @@ def experiment1():
     col_names = helper_functions.get_names_dict()
 
     for filename in os.listdir(abs_path):
+        filename = 'cmc.data'
         print('Running', filename)
         data = pd.read_csv(abs_path + filename, names=col_names[filename])
         run_experiment1(data, filename)
+        exit()
+
+# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_touse/cmc.data', names=helper_functions.get_names_dict()['cmc.data'])
+# data = data.astype({'age': 'float', 'children': 'float'})
+# data.to_csv('cmc.data', index=False)
+# exit()
 
 experiment1()

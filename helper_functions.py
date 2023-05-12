@@ -50,7 +50,10 @@ def credal_accuracies(y_pred, y_test):
 
     low_acc = (low_correct / len(y_test)) * 100
     up_acc = (up_correct / len(y_test)) * 100
-    robust_acc = (low_correct / robust_count) * 100
+    if robust_count == 0:
+        robust_acc = 0
+    else:
+        robust_acc = (low_correct / robust_count) * 100
 
     return low_acc, up_acc, robust_acc
 
@@ -73,8 +76,8 @@ def get_spn_distributions():
         'cmc.data': [spn.Gaussian, spn.Categorical, spn.Categorical, spn.Gaussian, spn.Categorical, spn.Categorical, spn.Categorical, spn.Gaussian, spn.Categorical],
         'german-credit.data': [],
         'iris.data': [spn.Gaussian] * 4,
-        'wdbc.data': [],
-        'wine.data': []
+        'wdbc.data': [spn.Gaussian] * 30,
+        'wine.data': [spn.Gaussian] * 13
     }
     return dict
 
@@ -85,7 +88,7 @@ def get_cspn_distributions():
         'cmc.data':  [cspn.Gaussian, cspn.Categorical, cspn.Categorical, cspn.Gaussian, cspn.Categorical, cspn.Categorical, cspn.Categorical, cspn.Gaussian, cspn.Categorical],
         'german-credit.data': [],
         'iris.data': [cspn.Gaussian] * 4,
-        'wdbc.data': [],
-        'wine.data': []
+        'wdbc.data': [cspn.Gaussian] * 30,
+        'wine.data': [cspn.Gaussian] * 13
     }
     return dict

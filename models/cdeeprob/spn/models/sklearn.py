@@ -165,9 +165,11 @@ class CSPNClassifier(BaseEstimator, ClassifierMixin):
         minclass = minll[1:self.n_classes_+1].T
         maxclass = maxll[1:self.n_classes_+1].T
         
-        minp = minclass * self.spn_.weights
-        maxp = maxclass * self.spn_.weights
+        minp = np.log(self.spn_.weights * np.exp(minclass))
+        maxp = np.log(self.spn_.weights * np.exp(maxclass))
+
         maxidx = np.argmax(maxp, axis=1)
+
         
         predictions = list()
         for m, i in zip(minp, maxidx):

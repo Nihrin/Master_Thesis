@@ -61,6 +61,13 @@ def split_rows_clusters_credal(
     minweights = list()
     n_samples = len(data) + len(nans)
     unique_clusters = np.unique(clusters)
+    
+    if len(unique_clusters) == 1:
+        slices.append(data)
+        maxweights.append(0)
+        minweights.append(0)
+        return slices, maxweights, minweights
+        
     for c in unique_clusters:
         local_data = data[clusters == c, :]
         lower = len(local_data) / n_samples
