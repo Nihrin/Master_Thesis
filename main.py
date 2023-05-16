@@ -64,7 +64,7 @@ def run_experiment1(data: pd.DataFrame, filename: str, reproduction: bool = Fals
     X = data.drop(['classes'], axis=1)
 
     if reproduction:
-        with open('reproduction_random_states.pkl', 'rb') as f:
+        with open('C:/Users/s164389/Desktop/Afstuderen/Thesis/reproduction_random_states.pkl', 'rb') as f:
             random_dict = pickle.load(f)
         random_state = random_dict[filename]
         random.setstate(random_state)
@@ -98,7 +98,7 @@ def run_experiment1(data: pd.DataFrame, filename: str, reproduction: bool = Fals
 def experiment1():
     abs_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp1/'
     col_names = helper_functions.get_names_dict()
-    with open('reproduction_random_states.pkl', 'rb') as f:
+    with open('C:/Users/s164389/Desktop/Afstuderen/Thesis/reproduction_random_states.pkl', 'rb') as f:
         random_dict = pickle.load(f)
 
     for filename in os.listdir(abs_path):
@@ -108,12 +108,12 @@ def experiment1():
         data = pd.read_csv(abs_path + filename, names=col_names[filename])
         random_state = run_experiment1(data, filename)
         random_dict[filename] = random_state
-        with open('reproduction_random_states.pkl', 'wb') as f:
+        with open('C:/Users/s164389/Desktop/Afstuderen/Thesis/reproduction_random_states.pkl', 'wb') as f:
             pickle.dump(random_dict, f)
 
-# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_touse/zoo.data', names=helper_functions.get_names_dict()['zoo.data'])
-# data = data.drop(['name'], axis=1)
-# data.to_csv('zoo.data', index=False, header=False)
+# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp1/dermatology.data', names=helper_functions.get_names_dict()['dermatology.data'])
+# data = data.astype({'34': 'float'})
+# data.to_csv('dermatology.data', index=False, header=False)
 # exit()
 
 experiment1()
