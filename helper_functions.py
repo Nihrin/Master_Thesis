@@ -5,16 +5,13 @@ import deeprob.spn.structure as spn
 import cdeeprob.spn.structure as cspn
 
 
-def create_missing_data(data: pd.DataFrame, percentage, random_state=None):
+def create_missing_data(data: pd.DataFrame, percentage):
     if percentage <= 0:
-        return data, random_state
-    if random_state == None:
-        random_state = random.getstate()
+        return data
     cells = set()
     n_rows = data.shape[0]
     n_cols = data.shape[1]
     to_delete = math.ceil(n_rows * (percentage / 100))
-    random.setstate(random_state)
     rows = random.sample(range(n_rows), to_delete)
 
     for row in rows:
@@ -25,7 +22,7 @@ def create_missing_data(data: pd.DataFrame, percentage, random_state=None):
     for cell in cells:
         data.iat[cell[0], cell[1]] = None
 
-    return data, random_state
+    return data
 
 
 def classical_accuracies(y_pred, y_test):
@@ -63,9 +60,12 @@ def get_names_dict():
         'car.data': ['buying', 'maint', 'doors', 'persons', 'lug_boot', 'safety', 'classes'],
         'cmc.data': ['age', 'education_w', 'education_h', 'children', 'religion', 'working', 'occupation_h', 'solindex', 'media', 'classes'],
         'german-credit.data': ['status', 'duration', 'history', 'purpose', 'amount', 'savings', 'employment', 'installmentrate', 'personalstatus', 'debtors', 'residence', 'property', 'age', 'installmentplans', 'housing', 'existingcredits', 'job', 'numpeople', 'telephone', 'foreign', 'classes'],
+        'haberman.data': ['age', 'operations', 'nodes', 'classes'],
         'iris.data': ['sepal_l', 'sepal_w', 'petal_l', 'petal_w', 'classes'],
+        'lymphography.data': ['classes', 'lymphatics', 'affere', 'lymph c', 'lymph s', 'by pass', 'extravasates', 'regen', 'uptake', 'nodes dim', 'nodes enl', 'changes l', 'defect', 'changes n', 'changes s', 'special', 'disloc', 'exlusion', 'no'],
         'wdbc.data': ['classes', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
-        'wine.data': ['classes', 'alcohol', 'malicacid', 'ash', 'alcalinityash', 'magnesium', 'phenols', 'flavanoids', 'nonflavphenols', 'proanthocyanins', 'colorintense', 'hue', 'diluted', 'proline']
+        'wine.data': ['classes', 'alcohol', 'malicacid', 'ash', 'alcalinityash', 'magnesium', 'phenols', 'flavanoids', 'nonflavphenols', 'proanthocyanins', 'colorintense', 'hue', 'diluted', 'proline'],
+        'zoo.data': ['hair', 'feathers', 'eggs', 'milk', 'airborne', 'aquatic', 'predator', 'toothed', 'backbone', 'breathes', 'venomous', 'fins', 'legs', 'tail', 'domestic', 'catsize', 'classes']  
     }
     return dict
 
@@ -75,9 +75,12 @@ def get_spn_distributions():
         'car.data': [spn.Categorical] * 6,
         'cmc.data': [spn.Gaussian, spn.Categorical, spn.Categorical, spn.Gaussian, spn.Categorical, spn.Categorical, spn.Categorical, spn.Gaussian, spn.Categorical],
         'german-credit.data': [],
+        'haberman.data': [spn.Gaussian] * 3,
         'iris.data': [spn.Gaussian] * 4,
+        'lymphography.data': [spn.Categorical] * 18,
         'wdbc.data': [spn.Gaussian] * 30,
-        'wine.data': [spn.Gaussian] * 13
+        'wine.data': [spn.Gaussian] * 13,
+        'zoo.data': [spn.Categorical] * 16
     }
     return dict
 
@@ -87,8 +90,11 @@ def get_cspn_distributions():
         'car.data': [cspn.Categorical] * 6,
         'cmc.data':  [cspn.Gaussian, cspn.Categorical, cspn.Categorical, cspn.Gaussian, cspn.Categorical, cspn.Categorical, cspn.Categorical, cspn.Gaussian, cspn.Categorical],
         'german-credit.data': [],
+        'haberman.data': [cspn.Gaussian] * 3,
         'iris.data': [cspn.Gaussian] * 4,
+        'lymphography.data': [cspn.Categorical] * 18,
         'wdbc.data': [cspn.Gaussian] * 30,
-        'wine.data': [cspn.Gaussian] * 13
+        'wine.data': [cspn.Gaussian] * 13,
+        'zoo.data': [cspn.Categorical] * 16
     }
     return dict

@@ -6,6 +6,7 @@ import helper_functions
 from sklearn.model_selection import train_test_split
 import os
 import random
+import pickle
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -55,58 +56,64 @@ def run_SPN_classifiers(X_train, X_test, y_train, y_test, distributions, random_
 
     return classical_acc, credal_acc_low, credal_acc_high, credal_robust_acc
 
-def run_experiment1(data: pd.DataFrame, filename: str):
+def run_experiment1(data: pd.DataFrame, filename: str, reproduction: bool = False):
     missing_data = [0, 5, 10, 20, 30]
     cross_validations = 30
     y = data['classes']
     y = pd.factorize(y)[0]
     X = data.drop(['classes'], axis=1)
 
-    reproduction_dict = dict()
+    if reproduction:
+        with open('reproduction_random_states.pkl', 'rb') as f:
+            random_dict = pickle.load(f)
+        random_state = random_dict[filename]
+        random.setstate(random_state)
+    else:
+        random_state = random.getstate()
+
     spn_distribution = helper_functions.get_spn_distributions()[filename]
     cspn_distribution = helper_functions.get_cspn_distributions()[filename]
     distributions = [spn_distribution, cspn_distribution]
-    naive_df = pd.DataFrame(columns=['%-missing', 'classic-acc', 'credal-low', 'credal-high', 'credal-robust'])
-    tree_df = pd.DataFrame(columns=['%-missing', 'classic-acc', 'credal-acc'])
-    spn_df = pd.DataFrame(columns=['%-missing', 'classic-acc', 'credal-low', 'credal-high', 'credal-robust'])
+    df = pd.DataFrame(columns=['%-missing', 'NBC acc', 'NCC low', 'NCC high', 'NCC robust', 'C4.5 acc', 'credal-C4.5 acc', 'SPN acc', 'CSPN low', 'CSPN high', 'CSPN robust'])
+
     for percentage in missing_data:
         for run in range(cross_validations):
             print('Missing', percentage, 'Run', run)
             random_state_int = random.randint(0, 20000)
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=random_state_int)
-            X_train, random_state_missing = helper_functions.create_missing_data(X_train, percentage)
+            X_train = helper_functions.create_missing_data(X_train, percentage)
             NBC_acc, NCC_acc_low, NCC_acc_high, NCC_robust_acc = run_naive_classifiers(X_train, X_test, y_train, y_test)
             tree_acc, credal_tree_acc = run_tree_classifiers(X_train, X_test, y_train, y_test)
             SPN_acc, CSPN_acc_low, CSPN_acc_high, CSPN_robust_acc = run_SPN_classifiers(X_train, X_test, y_train, y_test, distributions, random_state_int)
 
-            naive_df.loc[len(naive_df)] = [percentage, NBC_acc, NCC_acc_low, NCC_acc_high, NCC_robust_acc]
-            tree_df.loc[len(tree_df)] = [percentage, tree_acc, credal_tree_acc]
-            spn_df.loc[len(spn_df)] = [percentage, SPN_acc, CSPN_acc_low, CSPN_acc_high, CSPN_robust_acc]
+            df.loc[len(df)] = [percentage, NBC_acc, NCC_acc_low, NCC_acc_high, NCC_robust_acc, tree_acc, credal_tree_acc, SPN_acc, CSPN_acc_low, CSPN_acc_high, CSPN_robust_acc]
 
-            # reproduction_dict[(filename, missing_data, run)] = (random_state_int, random_state_missing)
-            
-    print('Naive')
-    print(naive_df.groupby(['%-missing']).mean())
-    print('C4.5')
-    print(tree_df.groupby(['%-missing']).mean())
-    print('SPN')
-    print(spn_df.groupby(['%-missing']).mean())
+    df = df.groupby(['%-missing']).mean()   
+    print(filename)
+    print(df)
+    df.to_excel('C:/Users/s164389/Desktop/Afstuderen/Thesis/Results_Exp1/' + filename[:-5] + '_results.xlsx')
 
+    return random_state
 
 def experiment1():
     abs_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp1/'
     col_names = helper_functions.get_names_dict()
+    with open('reproduction_random_states.pkl', 'rb') as f:
+        random_dict = pickle.load(f)
 
     for filename in os.listdir(abs_path):
-        filename = 'cmc.data'
+        if filename in random_dict:
+            continue
         print('Running', filename)
         data = pd.read_csv(abs_path + filename, names=col_names[filename])
-        run_experiment1(data, filename)
-        exit()
+        random_state = run_experiment1(data, filename)
+        random_dict[filename] = random_state
+        with open('reproduction_random_states.pkl', 'wb') as f:
+            pickle.dump(random_dict, f)
 
-# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_touse/cmc.data', names=helper_functions.get_names_dict()['cmc.data'])
-# data = data.astype({'age': 'float', 'children': 'float'})
-# data.to_csv('cmc.data', index=False)
+# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_touse/zoo.data', names=helper_functions.get_names_dict()['zoo.data'])
+# data = data.drop(['name'], axis=1)
+# data.to_csv('zoo.data', index=False, header=False)
 # exit()
 
 experiment1()
