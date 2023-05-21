@@ -111,9 +111,9 @@ def experiment1():
         with open('C:/Users/s164389/Desktop/Afstuderen/Thesis/reproduction_random_states.pkl', 'wb') as f:
             pickle.dump(random_dict, f)
 
-# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp1/dermatology.data', names=helper_functions.get_names_dict()['dermatology.data'])
-# data = data.astype({'34': 'float'})
-# data.to_csv('dermatology.data', index=False, header=False)
+# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_touse/nursery.data', names=helper_functions.get_names_dict()['nursery.data'])
+# data[['1', '2', '3', '4', '5', '6', '7']] = data[['1', '2', '3', '4', '5', '6', '7']].apply(lambda x: pd.factorize(x)[0])
+# data.to_csv('nursery.data', index=False, header=False)
 # exit()
 
 experiment1()
