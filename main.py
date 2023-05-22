@@ -100,6 +100,7 @@ def experiment(data_path, random_state_path, missing_data):
         random_dict = pickle.load(f)
 
     for filename in os.listdir(data_path):
+        filename = 'horse-colic.data'
         if filename in random_dict:
             continue
         print('Running', filename)
@@ -109,8 +110,7 @@ def experiment(data_path, random_state_path, missing_data):
         with open(random_state_path, 'wb') as f:
             pickle.dump(random_dict, f)
 
-
-# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp2/horse-colic.data', names=helper_functions.get_names_dict()['horse-colic.data'])
+# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp2/horse-colic.data', names=helper_functions.get_names_dict()['horse-colic.data'], dtype=object)
 # data[['24', '25', '26']] = data[['24', '25', '26']].apply(lambda x: pd.factorize(x)[0])
 # data = data.astype({'3': 'float', '4': 'float', '5': 'float', '15': 'float', '18': 'float', '19': 'float', '21': 'float'})
 # data = data.drop(['2'], axis=1)
