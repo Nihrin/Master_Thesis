@@ -56,8 +56,7 @@ def run_SPN_classifiers(X_train, X_test, y_train, y_test, distributions, random_
 
     return classical_acc, credal_acc_low, credal_acc_high, credal_robust_acc
 
-def run_experiment1(data: pd.DataFrame, filename: str, reproduction: bool = False):
-    missing_data = [0, 5, 10, 20, 30]
+def run_experiment(data: pd.DataFrame, filename: str, missing_data: list = [0], reproduction: bool = False):
     cross_validations = 30
     y = data['classes']
     y = pd.factorize(y)[0]
@@ -91,29 +90,35 @@ def run_experiment1(data: pd.DataFrame, filename: str, reproduction: bool = Fals
     df = df.groupby(['%-missing']).mean()   
     print(filename)
     print(df)
-    df.to_excel('C:/Users/s164389/Desktop/Afstuderen/Thesis/Results_Exp1/' + filename[:-5] + '_results.xlsx')
+    df.to_excel('C:/Users/s164389/Desktop/Afstuderen/Thesis/Results/' + filename[:-5] + '_results.xlsx')
 
     return random_state
 
-def experiment1():
-    abs_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp1/'
+def experiment(data_path, random_state_path, missing_data):
     col_names = helper_functions.get_names_dict()
-    with open('C:/Users/s164389/Desktop/Afstuderen/Thesis/reproduction_random_states.pkl', 'rb') as f:
+    with open(random_state_path, 'rb') as f:
         random_dict = pickle.load(f)
 
-    for filename in os.listdir(abs_path):
+    for filename in os.listdir(data_path):
         if filename in random_dict:
             continue
         print('Running', filename)
-        data = pd.read_csv(abs_path + filename, names=col_names[filename])
-        random_state = run_experiment1(data, filename)
+        data = pd.read_csv(data_path + filename, names=col_names[filename])
+        random_state = run_experiment(data, filename, missing_data)
         random_dict[filename] = random_state
-        with open('C:/Users/s164389/Desktop/Afstuderen/Thesis/reproduction_random_states.pkl', 'wb') as f:
+        with open(random_state_path, 'wb') as f:
             pickle.dump(random_dict, f)
 
-# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_touse/nursery.data', names=helper_functions.get_names_dict()['nursery.data'])
-# data[['1', '2', '3', '4', '5', '6', '7']] = data[['1', '2', '3', '4', '5', '6', '7']].apply(lambda x: pd.factorize(x)[0])
-# data.to_csv('nursery.data', index=False, header=False)
+
+# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp2/horse-colic.data', names=helper_functions.get_names_dict()['horse-colic.data'])
+# data[['24', '25', '26']] = data[['24', '25', '26']].apply(lambda x: pd.factorize(x)[0])
+# data = data.astype({'3': 'float', '4': 'float', '5': 'float', '15': 'float', '18': 'float', '19': 'float', '21': 'float'})
+# data = data.drop(['2'], axis=1)
+# data.to_csv('horse-colic.data', index=False, header=False)
 # exit()
 
-experiment1()
+data_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp2/'
+random_state_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/reproduction_random_states.pkl'
+missing_data = [0]
+
+experiment(data_path, random_state_path, missing_data)
