@@ -100,7 +100,6 @@ def experiment(data_path, random_state_path, missing_data):
         random_dict = pickle.load(f)
 
     for filename in os.listdir(data_path):
-        filename = 'horse-colic.data'
         if filename in random_dict:
             continue
         print('Running', filename)
@@ -110,15 +109,15 @@ def experiment(data_path, random_state_path, missing_data):
         with open(random_state_path, 'wb') as f:
             pickle.dump(random_dict, f)
 
-# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp2/horse-colic.data', names=helper_functions.get_names_dict()['horse-colic.data'], dtype=object)
-# data[['24', '25', '26']] = data[['24', '25', '26']].apply(lambda x: pd.factorize(x)[0])
+# data = pd.read_csv('C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp1/kr-vs-kp.data', names=helper_functions.get_names_dict()['kr-vs-kp.data'])
+# data[['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36']] = data[['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36']].apply(lambda x: pd.factorize(x)[0])
 # data = data.astype({'3': 'float', '4': 'float', '5': 'float', '15': 'float', '18': 'float', '19': 'float', '21': 'float'})
 # data = data.drop(['2'], axis=1)
-# data.to_csv('horse-colic.data', index=False, header=False)
+# data.to_csv('kr-vs-kp.data', index=False, header=False)
 # exit()
 
-data_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp2/'
+data_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp1/'
 random_state_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/reproduction_random_states.pkl'
-missing_data = [0]
+missing_data = [0, 5, 10, 20, 30]
 
 experiment(data_path, random_state_path, missing_data)
