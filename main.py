@@ -109,7 +109,6 @@ def experiment(data_path, random_state_path, missing_data):
         with open(random_state_path, 'wb') as f:
             pickle.dump(random_dict, f)
 
-
 data_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp1/'
 random_state_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/reproduction_random_states.pkl'
 missing_data = [0, 5, 10, 20, 30]
