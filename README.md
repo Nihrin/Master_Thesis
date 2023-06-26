@@ -6,3 +6,6 @@ All code was created in a Python 3.10 environment. All required packages that ca
 
 ### Running the code
 In the [main.py](main.py) file there are some folder directories that should be edited when running the code on your own computer. Other than that all code should run as given. When modifying the code it is possible that errors may occur for which the code was not tested.
+
+### Results
+The [Results](/Results) folder contains all raw results created by the [main.py](main.py) file, as well as summarized results and tables used in the report, see [clean results](/Results/_clean_results.xlsx).
