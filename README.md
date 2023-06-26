@@ -5,4 +5,4 @@ This GitHub repository contains all classifiers, data sets, and results that wer
 All code was created in a Python 3.10 environment. All required packages that can be pip installed can be found in the [requirements.txt](requirements.txt) file. To make use of the credal sum-product networks you will need to put the [cdeeprobkit](/models/cdeeprob) folder into the site-packages folder of your Python installation.
 
 ### Running the code
-In the (main.py)[main.py] file there are some folder directories that should be edited when running the code on your own computer. Other than that all code should run as given. When modifying the code it is possible that errors may occur for which the code was not tested.
+In the [main.py](main.py) file there are some folder directories that should be edited when running the code on your own computer. Other than that all code should run as given. When modifying the code it is possible that errors may occur for which the code was not tested.
