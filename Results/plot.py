@@ -7,7 +7,7 @@ exp2 = ['hepatitis', 'hepatitis-disc', 'horse-colic', 'horse-colic-disc', 'house
 
 def plot_classical_all_data(ax, exp1):
     cols = 3
-    rows = 5
+    rows = 6
 
     fig, axs = plt.subplots(rows, cols)
 
@@ -82,6 +82,7 @@ def plot_naive(ax, exp1):
         b = i % cols
         axs[a, b].plot(ax, data[1], label='NBC')
         axs[a, b].plot(ax, data[2], label='NCC low')
+        axs[a, b].plot(ax, data[3], label='NCC high')
         axs[a, b].plot(ax, data[4], label='NCC robust')
         axs[a, b].set_title(exp1[i])
         axs[a, b].set_ylim([0,100])
@@ -97,7 +98,7 @@ def plot_naive(ax, exp1):
 
     plt.subplots_adjust(left=0.30, bottom=0.11, right= 0.70, top=0.88, wspace=0.30, hspace=0.30)
 
-    fig.legend(labels=['NBC', 'NCC low', 'NCC robust'], loc='upper center', ncol=3)
+    fig.legend(labels=['NBC', 'NCC low', 'NCC high', 'NCC robust'], loc='upper center', ncol=4)
     plt.show()
 
 def plot_tree(ax, exp1):
@@ -143,6 +144,7 @@ def plot_spn(ax, exp1):
         b = i % cols
         axs[a, b].plot(ax, data[7], label='SPN')
         axs[a, b].plot(ax, data[8], label='CSPN low')
+        axs[a, b].plot(ax, data[9], label='CSPN high')
         axs[a, b].plot(ax, data[10], label='CSPN robust')
         axs[a, b].set_title(exp1[i])
         axs[a, b].set_ylim([0,100])
@@ -158,7 +160,7 @@ def plot_spn(ax, exp1):
 
     plt.subplots_adjust(left=0.30, bottom=0.11, right= 0.70, top=0.88, wspace=0.30, hspace=0.30)
 
-    fig.legend(labels=['SPN', 'CSPN low', 'CSPN robust'], loc='upper center', ncol=3)
+    fig.legend(labels=['SPN', 'CSPN low', 'CSPN high', 'CSPN robust'], loc='upper center', ncol=4)
     plt.show()
 
-plot_naive(ax, exp1)
+plot_robust_all_data(ax, exp1)

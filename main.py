@@ -94,13 +94,12 @@ def run_experiment(data: pd.DataFrame, filename: str, missing_data: list = [0], 
 
     return random_state
 
-def experiment(data_path, random_state_path, missing_data):
+def experiment(data_path, random_state_path, missing_data, reproduction: bool = False):
     col_names = helper_functions.get_names_dict()
     with open(random_state_path, 'rb') as f:
         random_dict = pickle.load(f)
-
     for filename in os.listdir(data_path):
-        if filename in random_dict:
+        if filename in random_dict and not reproduction:
             continue
         print('Running', filename)
         data = pd.read_csv(data_path + filename, names=col_names[filename])
@@ -112,5 +111,6 @@ def experiment(data_path, random_state_path, missing_data):
 data_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/Data_Exp1/'
 random_state_path = 'C:/Users/s164389/Desktop/Afstuderen/Thesis/reproduction_random_states.pkl'
 missing_data = [0, 5, 10, 20, 30]
+reproduction = False
 
-experiment(data_path, random_state_path, missing_data)
+experiment(data_path, random_state_path, missing_data, reproduction)
